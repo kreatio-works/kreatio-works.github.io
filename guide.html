@@ -1,0 +1,203 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>野球タイマー ― 使い方</title>
+<link rel="icon" href="favicon.png">
+<style>
+  :root{
+    --chalk:#E8EBE4; --card:#FFFFFF; --ink:#16202A; --soft:#65727B; --line:#C9D1C7;
+    --grass:#1E6B45; --clay:#B5502A; --alert:#A81E15; --steel:#2F5C74;
+    --display:"DIN Alternate","DIN Condensed","Roboto Condensed","Arial Narrow",ui-sans-serif,system-ui,sans-serif;
+    --ui:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--chalk);color:var(--ink);font-family:var(--ui);line-height:1.85;
+       -webkit-text-size-adjust:100%}
+  .page{max-width:760px;margin:0 auto;padding:28px 18px 60px}
+
+  header{display:flex;gap:16px;align-items:center;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+  header img{width:64px;height:64px;border-radius:14px;flex:0 0 auto}
+  header h1{font-size:26px;font-weight:800;letter-spacing:.01em;line-height:1.3}
+  header p{font-size:14px;color:var(--soft);font-weight:600;margin-top:2px}
+
+  .url{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+       padding:12px 14px;font-size:14px;font-weight:700}
+  .url span{display:block;font-size:11px;letter-spacing:.16em;color:var(--soft);margin-bottom:3px}
+  .url a{color:var(--steel);word-break:break-all}
+
+  h2{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin:30px 0 10px}
+  h2 i{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;
+       font-style:normal;font-family:var(--display);font-size:16px;font-weight:700;
+       display:flex;align-items:center;justify-content:center}
+  h3{font-size:15px;font-weight:800;margin:18px 0 4px}
+  p{font-size:14.5px}
+  ul{margin:6px 0 0 0;padding:0;list-style:none}
+  li{font-size:14.5px;padding-left:16px;position:relative;margin-bottom:3px}
+  li::before{content:"";position:absolute;left:2px;top:.78em;width:6px;height:6px;
+             background:var(--line);transform:rotate(45deg)}
+  b.g{color:var(--grass)}
+  b.c{color:var(--clay)}
+  b.s{color:var(--steel)}
+  b.a{color:var(--alert)}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-top:12px}
+  .card.warn{border-color:var(--clay);background:#FCF2EC}
+  .card h3{margin-top:0}
+  .steps{counter-reset:s}
+  .steps li{padding-left:30px;margin-bottom:6px}
+  .steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:.35em;
+    width:20px;height:20px;background:var(--ink);color:#fff;border-radius:50%;transform:none;
+    font-family:var(--display);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .btnsample{display:inline-block;background:var(--ink);color:#fff;border-radius:7px;
+             padding:1px 9px;font-size:13px;font-weight:700;margin:0 1px}
+  .btnsample.g{background:var(--grass)}
+  .btnsample.c{background:var(--clay)}
+  .btnsample.s{background:var(--steel)}
+  .btnsample.w{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  th,td{text-align:left;font-size:13.5px;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:11px;letter-spacing:.12em;color:var(--soft);white-space:nowrap}
+  td.q{font-weight:700;white-space:nowrap}
+  footer{margin-top:36px;padding-top:14px;border-top:2px solid var(--ink);font-size:13px;color:var(--soft)}
+
+  @media print{
+    @page{size:A4;margin:12mm}
+    body{background:#fff;line-height:1.7}
+    .page{max-width:none;padding:0}
+    h2{margin:16px 0 6px;font-size:15.5px;break-after:avoid}
+    h3{font-size:13px}
+    p,li,td{font-size:11px}
+    .card{padding:10px 12px;margin-top:8px;break-inside:avoid}
+    header img{width:48px;height:48px}
+    header h1{font-size:20px}
+    .noprint{display:none}
+  }
+</style>
+
+<div class="page">
+
+<header>
+  <img src="icon-192.png" alt="">
+  <div>
+    <h1>野球タイマー</h1>
+    <p>試合時間・インターバル・投手の球数を、スマホ1台でまとめて</p>
+  </div>
+</header>
+
+<div class="url">
+  <span>アプリのURL</span>
+  <a href="https://kreatio-works.github.io/forBaseball_timer/">https://kreatio-works.github.io/forBaseball_timer/</a>
+</div>
+
+<h2><i>1</i>まずホーム画面に追加</h2>
+<p>インストールは不要です。ブラウザで開いてホーム画面に追加すると、アプリのように一発で起動できます。</p>
+<div class="card">
+  <h3>iPhone（Safari）</h3>
+  <ul class="steps">
+    <li>上のURLをSafariで開く</li>
+    <li>下の共有ボタン（□に↑）を押す</li>
+    <li>「ホーム画面に追加」を選ぶ</li>
+  </ul>
+  <h3>Android（Chrome）</h3>
+  <ul class="steps">
+    <li>上のURLをChromeで開く</li>
+    <li>右上のメニュー（点3つ）を押す</li>
+    <li>「ホーム画面に追加」を選ぶ</li>
+  </ul>
+</div>
+
+<h2><i>2</i>画面は3つ</h2>
+<p>上の「<b>⏱ タイマー</b>」「<b>⚾ 球数</b>」「<b>📋 スコア</b>」で切り替えます。右上の歯車が設定です。
+タブのすぐ下には、いま開いていない画面の現状（残り時間・球数・スコア）が常に出ていて、タップするとその画面に飛べます。</p>
+
+<h2><i>3</i>試合時間をはかる</h2>
+<ul>
+  <li>大きな<span class="btnsample g">開始</span>で開始。押した時刻が<b>開始時刻</b>として記録されます</li>
+  <li>動いている間は<span class="btnsample">一時停止</span>。もう一度押すと再開します</li>
+  <li>試合が終わったら<span class="btnsample w">試合終了</span>。<b>終了時刻</b>が記録され、球数の一覧が開きます</li>
+  <li>画面上の帯（開始 13:02 / 終了 15:10）を<b>タップすると、日付・時刻・所要時間・投球数がコピー</b>されます</li>
+  <li>残り時間が0になっても止まりません。<b class="a">+00:45</b> のように、時間切れからの経過を赤で表示し続けます</li>
+  <li><span class="btnsample w">リセット</span>は誤操作を防ぐため2度押しです</li>
+</ul>
+
+<h2><i>4</i>インターバル（攻守交代など）</h2>
+<ul>
+  <li>下のオレンジの帯。<span class="btnsample c">開始</span>を押すと<b class="c">試合時間が自動で止まり</b>、5分のカウントダウンが始まります</li>
+  <li>0になると音と振動でお知らせ。そのあと試合時間が<b>自動で再開</b>します（設定で「手動」にも変更できます）</li>
+  <li>途中で切り上げるときは<span class="btnsample">終了</span>。すぐ試合時間に戻ります</li>
+</ul>
+
+<h2><i>5</i>フリータイマー（急にはかりたいとき）</h2>
+<ul>
+  <li>いちばん下の青い帯。<b>時間の部分をタップ</b>すると、計測（0から数え上げ）と1〜10分などのカウントダウンを選べます</li>
+  <li><span class="btnsample s">開始</span>で計測、<span class="btnsample">停止</span>で止まり、左の<b>×</b>で0に戻ります</li>
+  <li>初期設定では<b>試合時間は止まりません</b>。一緒に止めたいときは、設定の「フリータイマー中」を「止める」にしてください</li>
+</ul>
+
+<h2><i>6</i>投手の球数を数える</h2>
+<ul>
+  <li>球数画面の上には得点の帯があり、<b>−／＋でいま表示中のイニングに得点を入れられます</b>。合計はスコアの表と連動し、チーム名をタップするとスコアタブに移ります</li>
+  <li>「⚾ 球数」タブの<b>＋ 投手</b>で投手を登録します（何人でも可）。「投手の設定」で<b>相手</b>を選ぶと、相手投手の球数も数えられます（チップが青系で区別されます）</li>
+  <li>1球ごとに大きな<span class="btnsample g">＋1球</span>を押すだけ。「<b>この回</b>」と「<b class="g">累計</b>」が大きく出ます</li>
+  <li>イニングは<b>− ＋</b>で移動。押し間違えは<span class="btnsample w">1球戻す</span>で1球ずつ取り消せます</li>
+  <li>残りが10球を切ると、表示が<b class="c">残り ○球</b>の大きな数字に切り替わり、色と音で知らせます</li>
+  <li>連投のときは<span class="btnsample w">投手の設定・削除</span>から<b>前日・一昨日の球数</b>を入力できます。2日間の合計と「3日連続の登板」の注意が出ます</li>
+  <li>球数画面のいちばん下「数え方」をタップすると、<b>シンプル⇄BSO連動</b>を試合中でも切り替えられます。設定の「数え方」を<b>BSO連動</b>にすると、＋1球の代わりに<b>ストライク／ボール／ファウル／インプレー</b>で数えます。どれを押しても球数に加算され、B・S・Oのランプが自動で動きます（四球・三振・チェンジで自動リセット）。フライやゴロで打者がアウトになったら<b>アウト</b>、出塁したら<b>インプレー</b>を押します。牽制や盗塁死など投球をともなわないアウトは、<b>Oのランプをタップ</b>して足します</li>
+</ul>
+<div class="card warn">
+  <h3>球数の上限は必ず確認してください</h3>
+  <p>設定の「1日の上限」は初期値が入っているだけです。<b>所属連盟・大会の最新のガイドラインの数値に合わせて</b>使ってください。このアプリの表示は目安であり、規定そのものではありません。</p>
+</div>
+
+<h2><i>7</i>スコアをつける</h2>
+<ul>
+  <li>「📋 スコア」タブに、イニングごとの得点表があります</li>
+  <li><b>マスをタップ</b>して選び、下の<b>＋1／−1／0／空欄</b>で入力します</li>
+  <li>チーム名は表の左端を直接書き替えられます。「入替」で先攻後攻を入れ替え、「＋延長」で8回以降を追加、「−延長」で戻せます（得点が入っている回は2度押しで削除）</li>
+  <li>合計は自動計算。「コピー」でそのままLINEに貼れる形になります</li>
+  <li>球数・スコアの画面では、上に<b>試合の残り時間</b>が常に出ています。タップするとタイマーに戻ります</li>
+</ul>
+
+<h2><i>8</i>試合のあとに</h2>
+<ul>
+  <li><span class="btnsample w">試合終了</span>を押すと、<b>開始・終了時刻／スコア／投手ごとの球数</b>をまとめた画面が自動で開きます。スクショを撮ればそのまま共有できます</li>
+  <li>球数タブの<span class="btnsample w">一覧</span>からいつでも開けます。<b>‹ ›</b> で過去の日付も見返せます</li>
+  <li><span class="btnsample w">コピー</span>を押すとテキストになるので、LINEや記録シートにそのまま貼れます</li>
+</ul>
+
+<h3>次の試合に向けてリセットする</h3>
+<ul>
+  <li>同じ日に2試合目があるときは、まとめの下の<b>「新しい試合を始める」</b>。前の試合の記録を保存して、時刻・スコア・イニングを新しくします。<b>投手の球数は1日の上限のためそのまま積み上がります</b>。試合終了後はタイマー画面のボタンが<b>「新しい試合へ」</b>に変わり、そこからもまとめを開けます</li>
+  <li>やり直したいときは<b>⚙設定の「リセット」</b>から。<b>「今日をまるごとリセット」</b>で今日の時刻・スコア・球数・試合番号をすべて消せます（投手の登録と昨日までの記録は残ります）</li>
+  <li><b>「投手をすべて削除する」</b>を押すと、登録した投手と記録がすべて消えます</li>
+  <li>どちらも<b>2度押し</b>で実行されます。1度目は確認です</li>
+  <li>日付が変われば球数は自動的に0から始まるので、毎回リセットする必要はありません</li>
+</ul>
+
+<h2><i>9</i>記録の保存について</h2>
+<div class="card">
+  <ul>
+    <li>投手・球数・時刻・設定は<b>開いた端末の中だけ</b>に保存されます。どこにも送信されません</li>
+    <li><b>端末どうしで同期しません。</b>球数は毎回同じ端末で数えてください</li>
+    <li>ブラウザの履歴やサイトデータを消すと、記録も消えます</li>
+    <li>大事な記録は、一覧の「コピー」でスプレッドシートやLINEに残しておくのが確実です</li>
+  </ul>
+</div>
+
+<h2><i>10</i>困ったとき</h2>
+<table>
+  <tr><th>症状</th><th>対処</th></tr>
+  <tr><td class="q">音が鳴らない</td><td>設定の「音で知らせる」がオンか確認。端末がマナーモードだと鳴りません（振動はします）。一度どこかのボタンを押しておくと鳴りやすくなります</td></tr>
+  <tr><td class="q">計測中に画面が消える</td><td>設定の「画面を常時オンにする」をオン。機種によっては効かないことがあります</td></tr>
+  <tr><td class="q">球数を押しすぎた</td><td>「1球戻す」で1球ずつ戻せます</td></tr>
+  <tr><td class="q">前の試合の数字が残っている</td><td>球数は日付ごとに分かれます。日付が変われば自動で0からです</td></tr>
+  <tr><td class="q">時間の設定を変えたい</td><td>右上の歯車。秒は「− ＋」で10秒ずつ動きます</td></tr>
+  <tr><td class="q">アイコンや表示が古い</td><td>ホーム画面のアイコンを削除して、もう一度追加してください</td></tr>
+</table>
+
+<footer>
+  野球タイマー ／ 使い方のご案内（版：2026-08-23m）<br>
+  制作：<a href="https://kreatio-works.github.io/" style="color:var(--steel);font-weight:700">KREATIO works</a>
+</footer>
+
+</div>
