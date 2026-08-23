@@ -1,1384 +1,283 @@
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#E8EBE4">
-<title>野球タイマー</title>
-<link rel="icon" href="favicon.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="野球タイマー">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KREATIO WORKS ─ 図面・アプリ・整理収納</title>
+<meta name="description" content="KREATIO WORKS。困りごとを、つくって解く。建築図面作成 / アプリ・デザイン制作 / 片づけのWEBカウンセリング。">
+<meta property="og:title" content="KREATIO WORKS">
+<meta property="og:description" content="困りごとを、つくって解く。建築図面作成 / アプリ・デザイン制作 / 片づけのWEBカウンセリング">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kreatio-works.github.io/">
+<meta property="og:image" content="https://kreatio-works.github.io/ogp.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --chalk:#E8EBE4; --card:#FFFFFF; --ink:#16202A; --soft:#65727B; --line:#C9D1C7;
-    --grass:#1E6B45; --clay:#B5502A; --alert:#A81E15; --steel:#2F5C74;
-    --display:"DIN Alternate","DIN Condensed","Roboto Condensed","Arial Narrow",ui-sans-serif,system-ui,sans-serif;
-    --ui:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html{touch-action:manipulation}
-  button,.log,.itv-info,.chip,.pill{touch-action:manipulation;user-select:none;-webkit-user-select:none}
-  html,body{height:100%}
-  body{background:var(--chalk);color:var(--ink);font-family:var(--ui);overflow:hidden}
-  .app{height:100dvh;display:flex;flex-direction:column;
-       padding:calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 10px);
-       max-width:640px;margin:0 auto}
+:root{
+  --leaf:#D7EFB6; --leaf-tint:#EAF6D6; --paper:#FBFDF6;
+  --ink:#38657D; --ink-60:rgba(56,101,125,.6); --ink-14:rgba(56,101,125,.14);
+}
+*{margin:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Zen Kaku Gothic New',sans-serif; color:var(--ink); background:var(--paper);
+  background-image:linear-gradient(var(--ink-14) 1px,transparent 1px),linear-gradient(90deg,var(--ink-14) 1px,transparent 1px);
+  background-size:32px 32px; line-height:1.9; font-size:15.5px;
+}
+a{color:var(--ink)}
+a:focus-visible,button:focus-visible{outline:2.5px solid var(--ink);outline-offset:3px;border-radius:2px}
 
-  .top{display:flex;align-items:center;gap:10px;flex:0 0 auto}
-  .tabs{display:flex;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--card)}
-  .tabs button{border:none;background:transparent;color:var(--soft);font-family:var(--ui);
-               font-size:13px;font-weight:700;padding:10px 11px;cursor:pointer;white-space:nowrap}
-  .tabs button.sel{background:var(--ink);color:#fff}
-  .gear{margin-left:auto;width:44px;height:44px;border:none;background:transparent;color:var(--soft);
-        font-size:20px;line-height:1;border-radius:12px;cursor:pointer}
-  .gear:active{background:#00000010}
+/* ── hero ── */
+.hero{background:var(--leaf); border-bottom:2px solid var(--ink); padding:64px 20px 56px; text-align:center}
+.hero .logo{width:min(520px,86vw); height:auto; display:block; margin:0 auto}
+.hero .rays line, .hero .rays circle{stroke-dasharray:60; stroke-dashoffset:0}
+.tagline{margin-top:34px; font-size:clamp(17px,2.6vw,21px); font-weight:700; letter-spacing:.18em}
+.tagline-sub{margin-top:10px; font-size:13px; letter-spacing:.1em; color:var(--ink-60)}
+.tagline-sub i{font-family:'Jost',sans-serif; font-style:italic; letter-spacing:.05em}
 
-  .view{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
-  .hide{display:none!important}
+/* ── 寸法線見出し ── */
+.wrap{max-width:880px; margin:0 auto; padding:0 20px}
+.dim{display:flex; align-items:center; gap:14px; margin:72px 0 30px;
+  font-family:'Jost','Zen Kaku Gothic New',sans-serif; font-size:13px; letter-spacing:.3em; color:var(--ink)}
+.dim::before,.dim::after{content:""; flex:1; height:1.5px; background:var(--ink); position:relative}
+.dim span{display:flex; align-items:center; gap:10px}
+.dim .tick{width:1.5px; height:14px; background:var(--ink)}
 
-  /* ---- timer view ---- */
-  .log{flex:0 0 auto;display:flex;align-items:center;gap:16px;margin-top:8px;
-       border:1px solid var(--line);border-radius:12px;background:var(--card);padding:9px 12px;cursor:pointer}
-  .log:active{background:#F4F6F2}
-  .log .cell{display:flex;align-items:baseline;gap:7px}
-  .log .k{font-size:11px;letter-spacing:.14em;font-weight:700;color:var(--soft)}
-  .log .v{font-family:var(--display);font-size:21px;font-weight:700;line-height:1;
-          font-variant-numeric:tabular-nums}
-  .log .v.empty{color:var(--line)}
-  .log .copy{margin-left:auto;font-size:12px;font-weight:700;color:var(--soft)}
+/* ── サービス: 図枠カード ── */
+.sheets{display:grid; grid-template-columns:repeat(3,1fr); gap:22px}
+.sheet{background:#fff; border:1.8px solid var(--ink); display:flex; flex-direction:column}
+.sheet .fig{padding:26px 0 8px; display:flex; justify-content:center; background:var(--leaf-tint); border-bottom:1.8px solid var(--ink)}
+.sheet .fig svg{width:96px; height:96px}
+.sheet h3{font-size:16.5px; letter-spacing:.14em; padding:16px 18px 0; font-weight:700}
+.sheet p{padding:6px 18px 18px; font-size:13.5px; flex:1}
+.sheet .titleblock{border-top:1.5px solid var(--ink); display:grid; grid-template-columns:1fr auto;
+  font-family:'Jost',sans-serif; font-size:10.5px; letter-spacing:.18em; color:var(--ink-60)}
+.sheet .titleblock span{padding:6px 12px}
+.sheet .titleblock span+span{border-left:1.5px solid var(--ink-14)}
 
-  .stage{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;gap:16px;min-height:0}
-  .eyebrow{font-size:13px;letter-spacing:.22em;font-weight:700;color:var(--soft);text-align:center}
-  .clock{font-family:var(--display);font-size:clamp(3.6rem,20vw,7.6rem);line-height:.92;text-align:center;
-         font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em;transition:color .2s,opacity .2s}
-  .clock.paused{opacity:.42}
-  .clock.over{color:var(--alert)}
-  .track{position:relative;height:22px;margin:0 6px}
-  .track .rail{position:absolute;top:10px;left:0;right:0;height:2px;background:var(--line)}
-  .track .fill{position:absolute;top:10px;left:0;height:2px;background:var(--grass);transition:width .3s linear,background .2s}
-  .track .base{position:absolute;top:4px;width:14px;height:14px;margin-left:-7px;background:var(--ink);
-               transform:rotate(45deg);transition:left .3s linear,background .2s}
-  .over .rail{background:#E4C4C1}
-  .over .fill,.over .base{background:var(--alert)}
+/* ── 由来 ── */
+.origin{background:#fff; border:1.8px solid var(--ink); padding:28px 28px 26px; position:relative}
+.origin .sun-mark{position:absolute; top:-21px; left:50%; transform:translateX(-50%);
+  background:var(--paper); padding:0 12px}
+.origin p{font-size:14px; max-width:620px; margin:0 auto; text-align:center}
+.origin p+p{margin-top:10px}
+.funnel p{text-align:left; max-width:640px}
+.funnel p:first-child{text-align:center; letter-spacing:.14em; font-weight:700}
 
-  .controls{display:flex;flex-direction:column;gap:10px}
-  .main-btn{width:100%;min-height:clamp(74px,15vh,124px);border:none;border-radius:22px;background:var(--grass);
-            color:#fff;font-family:var(--ui);font-size:clamp(25px,6.6vw,33px);font-weight:700;letter-spacing:.08em;
-            cursor:pointer;box-shadow:0 6px 0 #16563a;transition:transform .06s,box-shadow .06s,background .2s}
-  .main-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #16563a}
-  .main-btn.running{background:var(--ink);box-shadow:0 6px 0 #0a1219}
-  .main-btn.running:active{box-shadow:0 2px 0 #0a1219}
-  .main-btn.waiting{background:var(--clay);box-shadow:0 6px 0 #8c3d1f;animation:pulse 1.4s ease-in-out infinite}
-  .main-btn.waiting:active{box-shadow:0 2px 0 #8c3d1f}
-  .main-btn.stop{background:var(--alert);box-shadow:0 6px 0 #7d1610}
-  .main-btn.stop:active{box-shadow:0 2px 0 #7d1610}
-  .main-btn[disabled]{opacity:.35;box-shadow:none;cursor:default;transform:none}
-  @keyframes pulse{50%{filter:brightness(1.18)}}
+/* ── links ── */
+.links{display:flex; justify-content:center; gap:18px; flex-wrap:wrap}
+.btn{display:inline-flex; align-items:center; gap:10px; border:1.8px solid var(--ink); background:#fff;
+  padding:12px 26px; text-decoration:none; font-family:'Jost','Zen Kaku Gothic New',sans-serif;
+  font-size:14px; letter-spacing:.2em; transition:background .18s,color .18s}
+.btn:hover{background:var(--ink); color:#fff}
+.btn:hover svg *{stroke:#fff}
+.btn svg{width:20px;height:20px}
 
-  .subrow{display:flex;gap:10px}
-  .sub-btn{flex:1 1 0;border:1px solid var(--line);background:var(--card);color:var(--ink);font-family:var(--ui);
-           font-size:15px;font-weight:700;padding:14px 8px;border-radius:14px;cursor:pointer;transition:opacity .15s}
-  .sub-btn:active{background:#EFF2EC}
-  .sub-btn[disabled]{opacity:.35;cursor:default}
-  .sub-btn.armed{color:var(--alert);border-color:var(--alert)}
+footer{margin-top:88px; border-top:2px solid var(--ink); background:var(--leaf);
+  text-align:center; padding:26px 20px; font-family:'Jost',sans-serif; font-size:12px; letter-spacing:.28em}
 
-  .itv{flex:0 0 auto;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
-       border-radius:16px;padding:8px 8px 8px 14px;margin-top:8px;transition:border-color .2s,background .2s}
-  .itv.on{border-color:var(--clay);background:#FCF2EC}
-  .itv-info{flex:1 1 auto;min-width:0}
-  .itv-label{font-size:11px;letter-spacing:.16em;font-weight:700;color:var(--soft);display:block}
-  .itv.on .itv-label{color:var(--clay)}
-  .itv-clock{font-family:var(--display);font-size:27px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums}
-  .itv.on .itv-clock{color:var(--clay)}
-  .itv-btn{flex:0 0 auto;border:none;border-radius:12px;background:var(--clay);color:#fff;font-family:var(--ui);
-           font-size:17px;font-weight:700;padding:15px 20px;cursor:pointer;min-width:88px}
-  .itv-btn:active{transform:scale(.97)}
-  .itv.on .itv-btn{background:var(--ink)}
-  .mini{flex:0 0 auto;width:40px;height:44px;border:none;border-radius:12px;background:#EFF2EC;color:var(--soft);
-        font-size:19px;font-weight:700;cursor:pointer}
-  .mini:active{background:#E2E7DE}
-  .itv-info.tap{cursor:pointer}
-  .itv-info .edit{font-size:11px;font-weight:700;color:var(--line);margin-left:8px}
-  .itv.free .itv-btn{background:var(--steel)}
-  .itv.free.on{border-color:var(--steel);background:#EDF2F5}
-  .itv.free.on .itv-label{color:var(--steel)}
-  .itv.free.on .itv-clock{color:var(--steel)}
-  .itv.free.on .itv-btn{background:var(--ink)}
-  .itv.free .itv-clock.done{color:var(--alert)}
-  .subrow.three .sub-btn{font-size:13px;padding:14px 2px;white-space:nowrap}
-  .datenav{display:flex;align-items:center;gap:8px;margin:14px 0 4px}
-  .datenav .d{flex:1 1 auto;text-align:center;font-size:16px;font-weight:700}
-  .pill{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:99px;
-        padding:10px 15px;font-family:var(--ui);font-size:13px;font-weight:700;cursor:pointer;
-        text-decoration:none;display:inline-block;flex:0 0 auto}
-  .pill:active{background:#EFF2EC}
-  .mini[disabled]{opacity:.3}
-  .wrap{overflow-x:auto;scrollbar-width:none}
-  .wrap::-webkit-scrollbar{display:none}
-  .tbl{width:100%;border-collapse:collapse}
-  .tbl th,.tbl td{padding:9px 7px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
-  .tbl th{font-size:11px;font-weight:700;color:var(--soft);letter-spacing:.08em}
-  .tbl td.nm{text-align:left;font-size:14px;font-weight:700}
-  .tbl td.num{font-family:var(--display);font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
-  .tbl td.zero{color:var(--line)}
-  .tbl td.tot{font-family:var(--display);font-size:19px;font-weight:700;color:var(--grass)}
-  .tbl th.tot{color:var(--grass)}
-  .tbl tr.sum td{border-bottom:none;border-top:2px solid var(--ink);color:var(--soft);font-size:13px}
-  .tbl tr.sum td.num,.tbl tr.sum td.tot{color:var(--ink)}
-  .note{font-size:12px;color:var(--soft);line-height:1.9;margin-top:12px}
-  .chipset{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0 4px}
-  .chipset button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:99px;
-                  padding:11px 16px;font-family:var(--ui);font-size:15px;font-weight:700;cursor:pointer}
-  .chipset button.sel{background:var(--steel);border-color:var(--steel);color:#fff}
-
-  .modeSw{flex:0 0 auto;margin-top:8px;border:none;background:transparent;color:var(--soft);
-          font-family:var(--ui);font-size:13px;font-weight:700;cursor:pointer;padding:8px;text-align:center}
-  .modeSw:active{color:var(--ink)}
-
-  /* ---- mini timer ---- */
-  .minit{flex:0 0 auto;display:flex;justify-content:center;align-items:baseline;gap:12px;margin-top:8px;
-         background:var(--card);border:1px solid var(--line);border-radius:11px;padding:6px 10px;
-         font-size:12px;font-weight:700;color:var(--soft);letter-spacing:.02em}
-  .minit b{font-family:var(--display);font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums;margin:0 1px}
-  .minit .mseg{display:flex;align-items:baseline;gap:4px;cursor:pointer;white-space:nowrap;
-               padding:5px 7px;margin:-5px -3px;border-radius:8px}
-  .minit .mseg:active{background:#00000010}
-  .minit b.clay{color:var(--clay)}
-  .minit b.red{color:var(--alert)}
-  .minit .msep{color:var(--line)}
-
-  /* ---- score view ---- */
-  .scbar{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:10px 0 8px}
-  .scbar .t{flex:1 1 auto;font-size:13px;letter-spacing:.18em;font-weight:700;color:var(--soft)}
-  .scwrap{flex:0 0 auto;overflow-x:auto;background:var(--card);border:1px solid var(--line);
-          border-radius:14px;scrollbar-width:none}
-  .scwrap::-webkit-scrollbar{display:none}
-  .sc{border-collapse:collapse;width:100%}
-  .sc th{font-size:11px;font-weight:700;color:var(--soft);padding:8px 0 4px;text-align:center;min-width:38px}
-  .sc th.nm{min-width:86px}
-  .sc td{border-top:1px solid var(--line);text-align:center;padding:0}
-  .sc td.cell{font-family:var(--display);font-size:20px;font-weight:700;height:52px;min-width:38px;
-              cursor:pointer;font-variant-numeric:tabular-nums}
-  .sc td.cell.blank{color:var(--line)}
-  .sc td.cell.sel{outline:3px solid var(--clay);outline-offset:-3px;border-radius:8px;background:#FCF2EC}
-  .sc td.r{font-family:var(--display);font-size:22px;font-weight:700;color:var(--grass);min-width:46px}
-  .scname{width:100%;border:none;background:transparent;font-family:var(--ui);font-size:14px;font-weight:700;
-          color:var(--ink);padding:8px 6px;min-width:0}
-  .scbtns{flex:0 0 auto;display:flex;align-items:center;gap:8px;margin-top:10px}
-  .scbtns .lab{flex:1 1 auto;font-size:13px;font-weight:700;color:var(--soft)}
-  .scbtns button{flex:0 0 auto;min-width:58px;height:52px;border:1px solid var(--line);background:var(--card);
-                 border-radius:12px;font-family:var(--ui);font-size:16px;font-weight:700;color:var(--ink);cursor:pointer}
-  .scbtns button:active{background:#EFF2EC}
-  .scbtns button.p{background:var(--grass);border-color:var(--grass);color:#fff}
-  .schint{flex:0 0 auto;font-size:12px;color:var(--soft);font-weight:600;margin-top:10px;text-align:center}
-  .scbar{flex-wrap:wrap}
-  .pill.armed{color:var(--alert);border-color:var(--alert)}
-
-  /* ---- BSO ---- */
-  .bso{display:flex;flex-direction:column;gap:8px}
-  .duo{display:flex;gap:10px}
-  .main-btn.half{flex:1 1 0;min-height:clamp(60px,11vh,96px);font-size:clamp(18px,4.8vw,24px);letter-spacing:.04em}
-  .main-btn.half.ballb{background:var(--steel);box-shadow:0 6px 0 #1f3f52}
-  .main-btn.half.ballb:active{box-shadow:0 2px 0 #1f3f52}
-  .main-btn.half.stop{background:var(--alert);box-shadow:0 6px 0 #7d1610}
-  .bsorow{display:flex;justify-content:center;gap:26px;align-items:center;background:var(--card);
-          border:1px solid var(--line);border-radius:12px;padding:12px 8px}
-  .bsorow .set{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--soft)}
-  .bsorow .set b{margin-right:4px;color:var(--ink);font-size:20px;font-family:var(--display)}
-  .dot{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--line);background:transparent}
-  .dot.b.on{background:var(--grass);border-color:var(--grass)}
-  .dot.s.on{background:#C9930A;border-color:#C9930A}
-  .dot.o.on{background:var(--alert);border-color:var(--alert)}
-
-  /* ---- pitch view ---- */
-  .chips{flex:0 0 auto;display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:none}
-  .chips::-webkit-scrollbar{display:none}
-  .chip{flex:0 0 auto;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:9px 14px;
-        font-family:var(--ui);font-size:14px;font-weight:700;color:var(--soft);cursor:pointer;white-space:nowrap}
-  .chip .n{font-family:var(--display);font-size:15px;margin-left:7px;color:var(--ink)}
-  .chip.sel{background:var(--ink);border-color:var(--ink);color:#fff}
-  .chip.sel .n{color:#fff}
-  .chip.add{color:var(--grass);border-style:dashed}
-  .chip.opp{border-color:#B9C9D2;color:var(--steel)}
-  .chip.opp .n{color:var(--steel)}
-  .chip.opp.sel{background:var(--steel);border-color:var(--steel);color:#fff}
-  .chip.opp.sel .n{color:#fff}
-
-  .pmain{flex:1 1 auto;display:flex;flex-direction:column;justify-content:flex-start;gap:12px;min-height:0;overflow-y:auto}
-  .pmain>:first-child{margin-top:auto}
-  .pmain>:last-child{margin-bottom:auto}
-  .pscore{flex:0 0 auto;display:flex;align-items:center;gap:6px;background:var(--card);
-          border:1px solid var(--line);border-radius:12px;padding:5px 8px;margin-top:6px}
-  .pscore .nm{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-              font-size:12px;font-weight:700;color:var(--soft);background:none;border:none;
-              padding:6px 0;cursor:pointer;font-family:var(--ui)}
-  .pscore .nm.ra{text-align:right}
-  .pscore .nm.lb{text-align:left}
-  .pscore b{font-family:var(--display);font-size:22px;min-width:24px;text-align:center;
-            font-variant-numeric:tabular-nums}
-  .pscore .sb{width:34px;height:38px;border:1px solid var(--line);background:#fff;border-radius:9px;
-              font-size:17px;font-weight:700;color:var(--ink);cursor:pointer;padding:0}
-  .pscore .sb:active{background:#EFF2EC}
-  .pscore .sep{color:var(--line);font-weight:700}
-  .pname{text-align:center;font-size:21px;font-weight:700}
-  .pname i{font-style:normal;font-size:14px;color:var(--soft);margin-left:6px}
-  .ptwo{display:flex;align-items:flex-start;justify-content:center;gap:16px}
-  .pcell{display:flex;flex-direction:column;align-items:center;line-height:1;min-width:96px}
-  .pcell .lab{font-size:12px;letter-spacing:.2em;font-weight:700;color:var(--soft);margin-bottom:8px}
-  .pcell .big{font-family:var(--display);font-size:clamp(3.2rem,16vw,5.6rem);font-weight:700;
-              font-variant-numeric:tabular-nums}
-  .pcell.total .big{color:var(--grass)}
-  .pcell .q{font-family:var(--ui);font-size:15px;font-weight:700;color:var(--soft);margin-left:3px}
-  .pdiv{width:1px;align-self:stretch;background:var(--line);margin-top:22px}
-  .pone{text-align:center;line-height:1}
-  .pone .lab{font-size:13px;letter-spacing:.22em;font-weight:700;color:var(--clay)}
-  .pone .big{font-family:var(--display);font-size:clamp(4.4rem,25vw,8.4rem);font-weight:700;
-             color:var(--clay);font-variant-numeric:tabular-nums;transition:color .2s}
-  .pone.stop .lab,.pone.stop .big{color:var(--alert)}
-  .pone .q{font-family:var(--ui);font-size:24px;font-weight:700;margin-left:4px;color:var(--clay)}
-  .pone.stop .q{color:var(--alert)}
-  .pone .det{font-size:14px;font-weight:700;color:var(--soft);margin-top:10px}
-  .pone .det b{font-family:var(--display);font-size:19px;color:var(--ink);margin:0 3px}
-  .pmeta{text-align:center;font-size:13px;color:var(--soft);font-weight:600;line-height:1.7}
-  .pmeta b{font-family:var(--display);font-size:16px;color:var(--ink)}
-
-  .innrow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
-          border-radius:16px;padding:8px 12px}
-  .innrow button{width:46px;height:46px;border:none;border-radius:12px;background:#EFF2EC;color:var(--ink);
-                 font-size:22px;font-weight:700;cursor:pointer}
-  .innrow button:active{background:#E2E7DE}
-  .inn{font-family:var(--display);font-size:26px;font-weight:700;min-width:56px;text-align:center}
-  .inncount{margin-left:auto;font-size:12px;color:var(--soft);font-weight:700}
-  .inncount b{font-family:var(--display);font-size:22px;color:var(--ink);margin:0 3px}
-  .bd{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
-  .bd::-webkit-scrollbar{display:none}
-  .bd span{flex:0 0 auto;font-size:11px;font-weight:700;color:var(--soft);background:var(--card);
-           border:1px solid var(--line);border-radius:8px;padding:5px 9px}
-  .bd span b{font-family:var(--display);font-size:14px;color:var(--ink);margin-left:5px}
-  .empty{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
-         color:var(--soft);font-size:15px;font-weight:600;text-align:center;line-height:1.8}
-
-  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 96px);transform:translate(-50%,10px);
-         background:var(--ink);color:#fff;font-size:14px;font-weight:600;padding:11px 18px;border-radius:99px;
-         opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
-  .toast.show{opacity:1;transform:translate(-50%,0)}
-
-  .veil{position:fixed;inset:0;background:#16202A80;opacity:0;pointer-events:none;transition:opacity .2s}
-  .veil.open{opacity:1;pointer-events:auto}
-  .sheet{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-radius:22px 22px 0 0;
-         padding:20px 20px calc(env(safe-area-inset-bottom) + 20px);max-width:640px;margin:0 auto;
-         transform:translateY(102%);transition:transform .25s ease;max-height:88dvh;overflow-y:auto}
-  .sheet.open{transform:translateY(0)}
-  .sheet h2{font-size:17px;font-weight:700;margin-bottom:4px}
-  .sheet .hint{font-size:13px;color:var(--soft);margin-bottom:16px;line-height:1.7}
-  .grp{font-size:11px;letter-spacing:.16em;font-weight:700;color:var(--soft);margin-top:20px}
-  .row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 0;border-top:1px solid var(--line)}
-  .row .name{font-size:15px;font-weight:600}
-  .row .sub{font-size:12px;color:var(--soft);margin-top:2px}
-  .num{width:74px;padding:11px 8px;text-align:center;border:1px solid var(--line);border-radius:10px;
-       font-family:var(--display);font-size:22px;font-weight:700;background:#fff;color:var(--ink)}
-  .txt{flex:1 1 auto;min-width:0;padding:12px;border:1px solid var(--line);border-radius:10px;
-       font-family:var(--ui);font-size:16px;background:#fff;color:var(--ink)}
-  .unit{font-size:13px;color:var(--soft);margin:0 10px 0 5px}
-  .row.col{flex-direction:column;align-items:stretch;gap:12px}
-  .steps{display:flex;gap:12px}
-  .stepbox{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:5px}
-  .step{display:flex;align-items:center;gap:6px;width:100%}
-  .step button{flex:0 0 auto;width:44px;height:46px;border:1px solid var(--line);background:#fff;
-               border-radius:11px;font-family:var(--ui);font-size:20px;font-weight:700;color:var(--ink);cursor:pointer}
-  .step button:active{background:#EFF2EC}
-  .step .num{flex:1 1 auto;width:auto;min-width:0}
-  .cap{font-size:11px;letter-spacing:.1em;font-weight:700;color:var(--soft)}
-  .seg{display:flex;border:1px solid var(--line);border-radius:11px;overflow:hidden;flex:0 0 auto}
-  .seg button{border:none;background:#fff;color:var(--soft);font-family:var(--ui);font-size:14px;font-weight:700;
-              padding:11px 15px;cursor:pointer}
-  .seg button.sel{background:var(--ink);color:#fff}
-  .close{width:100%;margin-top:18px;border:none;border-radius:14px;background:var(--ink);color:#fff;
-         font-family:var(--ui);font-size:17px;font-weight:700;padding:17px;cursor:pointer}
-  .danger{width:100%;margin-top:10px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--soft);
-          font-family:var(--ui);font-size:15px;font-weight:700;padding:15px;cursor:pointer}
-  .danger.armed{color:var(--alert);border-color:var(--alert)}
-  .close.armed{background:var(--alert)}
-  :focus-visible{outline:3px solid var(--clay);outline-offset:2px}
-  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.sheet .more{flex:1; margin:6px 18px 18px}
+.sheet .more summary{cursor:pointer; list-style:none; display:inline-flex; align-items:center; gap:8px;
+  font-family:'Jost','Zen Kaku Gothic New',sans-serif; font-size:12px; letter-spacing:.22em; color:var(--ink-60)}
+.sheet .more summary::-webkit-details-marker{display:none}
+.sheet .more summary::before{content:"+"; font-size:15px; line-height:1; border:1.5px solid var(--ink-60);
+  width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%}
+.sheet .more[open] summary::before{content:"−"}
+.sheet .more summary:hover{color:var(--ink)}
+.sheet .more p{padding:12px 0 0; font-size:13.5px}
+.dim .ball{width:19px; height:19px; flex:none}
+.sheets.two{grid-template-columns:1fr 1fr}
+.sheet .btn{margin:0 18px 16px; justify-content:center; font-size:13px; padding:10px 18px}
+@media (max-width:700px){
+  .sheets.two{grid-template-columns:1fr}
+  .sheets{grid-template-columns:1fr}
+  .dim{margin:56px 0 24px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .hero .logo{animation:rise .9s ease-out both}
+  @keyframes rise{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+}
 </style>
+</head>
+<body>
 
-<div class="app">
-  <div class="top">
-    <div class="tabs" id="tabs">
-      <button data-t="timer" class="sel">⏱ タイマー</button>
-      <button data-t="pitch">⚾ 球数</button>
-      <button data-t="score">📋 スコア</button>
-    </div>
-    <button class="gear" id="gear" aria-label="設定">⚙</button>
-  </div>
+<header class="hero">
+  <svg class="logo" viewBox="0 0 800 360" role="img" aria-label="KREATIO WORKS"><g transform="translate(117.5,170) scale(1.0)"><path d="M -24 -66 L -24 0" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M -21 -30 L 24 -66" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M -21 -30 L 26 0" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g transform="translate(216.5,170) scale(1.0)"><path d="M -24 -66 L -24 0" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M -21 -66 L 4 -66 A 18 18 0 0 1 4 -30 L -21 -30" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 2 -30 L 26 0" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g transform="translate(313.5,170) scale(1.0)"><path d="M -22 -66 L -22 0" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M -19 -66 L 24 -66" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M -19 -33 L 16 -33" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M -19 0 L 24 0" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g transform="translate(420.0,170) scale(1.0)"><path d="M -29 -3 L 0 -66 L 29 -3" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M -42 -23.5 L 9.7 -23.5 L 12.1 -18 L -42 -18 Z" fill="#38657D" stroke="#38657D" stroke-width="1.5" stroke-linejoin="round"/></g>
+<g transform="translate(514.5,170) scale(1.0)"><path d="M -28 -66 L 28 -66" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 0 -66 L 0 0" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g transform="translate(591.5,170) scale(1.0)"><path d="M 0 -66 L 0 0" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g transform="translate(673.5,170) scale(1.0)"><path d="M 0 -66 A 33 33 0 1 1 -0.01 -66 Z" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g transform="translate(273.6,255) scale(0.44)"><path d="M -32 -66 L -16 0 L 0 -46 L 16 0 L 32 -66" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g transform="translate(345.7,241)"><circle cx="0" cy="0" r="13.0" fill="none" stroke="#38657D" stroke-width="3.0"/>
+<line x1="17.6" y1="7.3" x2="24.0" y2="9.9" stroke="#38657D" stroke-width="3.0" stroke-linecap="round"/>
+<line x1="7.3" y1="17.6" x2="8.8" y2="21.2" stroke="#38657D" stroke-width="3.0" stroke-linecap="round"/>
+<line x1="-7.3" y1="17.6" x2="-10.3" y2="24.9" stroke="#38657D" stroke-width="3.0" stroke-linecap="round"/>
+<line x1="-17.6" y1="7.3" x2="-21.2" y2="8.8" stroke="#38657D" stroke-width="3.0" stroke-linecap="round"/>
+<line x1="-17.6" y1="-7.3" x2="-23.1" y2="-9.6" stroke="#38657D" stroke-width="3.0" stroke-linecap="round"/>
+<line x1="-7.3" y1="-17.6" x2="-8.8" y2="-21.2" stroke="#38657D" stroke-width="3.0" stroke-linecap="round"/>
+<line x1="7.3" y1="-17.6" x2="10.3" y2="-24.9" stroke="#38657D" stroke-width="3.0" stroke-linecap="round"/>
+<line x1="17.6" y1="-7.3" x2="22.2" y2="-9.2" stroke="#38657D" stroke-width="3.0" stroke-linecap="round"/></g>
+<g transform="translate(414.2,255) scale(0.44)"><path d="M -24 -66 L -24 0" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M -21 -66 L 4 -66 A 18 18 0 0 1 4 -30 L -21 -30" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 2 -30 L 26 0" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g transform="translate(473.2,255) scale(0.44)"><path d="M -24 -66 L -24 0" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M -21 -30 L 24 -66" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M -21 -30 L 26 0" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g transform="translate(531.2,255) scale(0.44)"><path d="M 20 -56 C 13 -67 -18 -69 -20 -53 C -22 -38 19 -42 20 -19 C 21 -3 -14 0 -21 -12" fill="none" stroke="#38657D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+  <p class="tagline">困りごとを、つくって解く。</p>
+  <p class="tagline-sub"><i>creatio</i> ─ ラテン語で「創造」</p>
+</header>
 
-  <div class="minit" id="miniT">
-    <span class="mseg" data-t="timer" id="msTime"><span id="msTimeLab">残り</span><b id="msTimeVal">2:00:00</b></span>
-    <span class="msep" id="msSep1">｜</span>
-    <span class="mseg" data-t="pitch" id="msPitch"><span id="msPitchLab"></span><b id="msPitchVal">0</b>球</span>
-    <span class="msep" id="msSep2">｜</span>
-    <span class="mseg" data-t="score" id="msScore"><b id="msScoreA">0</b>-<b id="msScoreB">0</b></span>
-  </div>
+<main class="wrap">
 
-  <!-- ================= timer ================= -->
-  <div class="view" id="viewTimer">
-    <div class="log" id="log">
-      <div class="cell"><span class="k">開始</span><span class="v empty" id="logStart">—:—</span></div>
-      <div class="cell"><span class="k">終了</span><span class="v empty" id="logEnd">—:—</span></div>
-      <span class="copy">タップでコピー</span>
-    </div>
-    <div class="stage">
-      <p class="eyebrow" id="state">残り時間</p>
-      <div class="clock paused" id="clock">2:00:00</div>
-      <div class="track" id="track"><div class="rail"></div><div class="fill" id="fill"></div><div class="base" id="base"></div></div>
-      <div class="controls">
-        <button class="main-btn" id="main">開始</button>
-        <div class="subrow">
-          <button class="sub-btn" id="finish">試合終了</button>
-          <button class="sub-btn" id="reset">リセット</button>
-        </div>
+  <h2 class="dim"><span><span class="tick"></span>SERVICES<span class="tick"></span></span></h2>
+  <section class="sheets">
+
+    <article class="sheet">
+      <div class="fig" aria-hidden="true">
+        <svg viewBox="0 0 96 96" fill="none" stroke="#38657D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="18" y="16" width="60" height="42" rx="2"/>
+          <path d="M18 44 L46 24 L78 40"/>
+          <path d="M18 70 L78 70"/><path d="M18 66 L18 74"/><path d="M78 66 L78 74"/>
+          <path d="M24 70 L30 67 M24 70 L30 73"/><path d="M72 70 L66 67 M72 70 L66 73"/>
+        </svg>
       </div>
-    </div>
-    <div class="itv" id="itv">
-      <div class="itv-info">
-        <span class="itv-label" id="itvLabel">インターバル</span>
-        <span class="itv-clock" id="itvClock">5:00</span>
+      <h3>建築図面作成</h3>
+      <details class="more"><summary>詳しく見る</summary>
+      <p>Jw_cad による意匠図・施工図の作成。現在は提携先の業務を中心にお受けしているため、新規のご依頼はお休みしています。単発のご相談は一度お声がけください。</p>
+      </details>
+      <div class="titleblock"><span>DRAWING ─ 受付休止中(単発は相談可)</span><span>S-01</span></div>
+    </article>
+
+    <article class="sheet">
+      <div class="fig" aria-hidden="true">
+        <svg viewBox="0 0 96 96" fill="none" stroke="#38657D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="30" y="14" width="36" height="68" rx="8"/>
+          <path d="M44 74 L52 74"/>
+          <circle cx="48" cy="42" r="9"/>
+          <path d="M48 27 L48 23 M48 57 L48 61 M61 42 L65 42 M35 42 L31 42 M58 33 L61 30 M38 51 L35 54 M58 51 L61 54 M38 33 L35 30"/>
+        </svg>
       </div>
-      <button class="itv-btn" id="itvBtn">開始</button>
-    </div>
-    <div class="itv free" id="fr">
-      <div class="itv-info tap" id="frInfo">
-        <span class="itv-label" id="frLabel">フリータイマー<span class="edit">タップで変更</span></span>
-        <span class="itv-clock" id="frClock">3:00</span>
+      <h3>アプリ・デザイン制作</h3>
+      <details class="more"><summary>詳しく見る</summary>
+      <p>日々の課題を解決するための、実用的で創造的なツールを制作しています。建築・建設の現場向けの写真整理・集計ツールから、野球チーム運営アプリや暮らしのチラシ制作まで、幅広い領域に対応しています。</p>
+      </details>
+      <div class="titleblock"><span>APP / WEB</span><span>S-02</span></div>
+    </article>
+
+    <article class="sheet">
+      <div class="fig" aria-hidden="true">
+        <svg viewBox="0 0 96 96" fill="none" stroke="#38657D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="48" cy="36" r="12"/>
+          <path d="M27 78 C 27 62 37 55 48 55 C 59 55 69 62 69 78"/>
+          <path d="M33 34 A 15 15 0 0 1 63 34"/>
+          <path d="M33 34 L33 42 M63 34 L63 42"/>
+          <path d="M63 42 C 63 50 56 52 51 52"/>
+        </svg>
       </div>
-      <button class="mini hide" id="frReset" aria-label="リセット">×</button>
-      <button class="itv-btn" id="frBtn">開始</button>
-    </div>
-  </div>
+      <h3>片づけのWEBカウンセリング</h3>
+      <details class="more"><summary>詳しく見る</summary>
+      <p>オンラインでの片づけ相談。離れて暮らす実家の片づけなど、「何から手を付ければいいか分からない」を、間取りとしくみの視点から一緒にほどいていきます。（整理収納アドバイザー2級を保有）</p>
+      <p style="padding-top:12px"><a class="btn" href="https://forms.gle/AiM5eZTKguVXq6if8" target="_blank" rel="noopener">相談してみる</a></p>
+      </details>
+      <div class="titleblock"><span>ORGANIZE ─ ONLINE</span><span>S-03</span></div>
+    </article>
 
-  <!-- ================= pitch ================= -->
-  <div class="view hide" id="viewPitch">
-    <div class="chips" id="chips"></div>
-    <div class="pscore" id="pScore">
-      <button class="nm ra" data-side="a" id="psNameA">自チーム</button>
-      <b id="psValA">0</b>
-      <button class="sb" data-sc="a-1">−</button>
-      <button class="sb" data-sc="a+1">＋</button>
-      <span class="sep">｜</span>
-      <button class="sb" data-sc="b-1">−</button>
-      <button class="sb" data-sc="b+1">＋</button>
-      <b id="psValB">0</b>
-      <button class="nm lb" data-side="b" id="psNameB">相手</button>
-    </div>
-    <div class="empty hide" id="pEmpty">投手を登録すると<br>球数を数えられます</div>
-    <div class="pmain" id="pMain">
-      <div class="pname" id="pName">—<i>投手</i></div>
-      <div class="ptwo" id="pTwo">
-        <div class="pcell"><span class="lab">この回</span>
-          <div><span class="big" id="pInn">0</span><span class="q">球</span></div></div>
-        <div class="pdiv"></div>
-        <div class="pcell total"><span class="lab">累計</span>
-          <div><span class="big" id="pTotal">0</span><span class="q">球</span></div></div>
+  </section>
+
+
+  <h2 class="dim"><span><span class="tick"></span><svg class="ball" viewBox="0 0 24 24" fill="none" stroke="#38657D" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M6.5 4.9 A 13 13 0 0 0 6.5 19.1"/><path d="M17.5 4.9 A 13 13 0 0 1 17.5 19.1"/></svg>FOR&nbsp;BASEBALL&nbsp;TEAMS<span class="tick"></span></span></h2>
+  <section class="sheets two">
+
+    <article class="sheet">
+      <div class="fig" aria-hidden="true">
+        <svg viewBox="0 0 96 96" fill="none" stroke="#38657D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="48" cy="54" r="26"/>
+          <path d="M48 54 L48 38"/><path d="M48 54 L58 60"/>
+          <path d="M42 20 L54 20"/><path d="M48 20 L48 28"/>
+          <path d="M68 32 L73 27"/>
+        </svg>
       </div>
-      <div class="pone hide" id="pOne">
-        <div class="lab" id="pOneLab">残り</div>
-        <div><span class="big" id="pRemain">9</span><span class="q">球</span></div>
-        <div class="det" id="pOneDet"></div>
+      <h3>試合タイマー(無料公開中)</h3>
+      <p>試合時間のタイマーと投球数のカウントをスマホひとつで。グラウンドでそのまま使える無料アプリです。得点管理などの機能も実装しました。</p>
+      <a class="btn" href="https://kreatio-works.github.io/forBaseball_timer/" target="_blank" rel="noopener">アプリを使ってみる</a>
+      <div class="titleblock"><span>FREE APP ─ 公開中</span><span>B-01</span></div>
+    </article>
+
+    <article class="sheet">
+      <div class="fig" aria-hidden="true">
+        <svg viewBox="0 0 96 96" fill="none" stroke="#38657D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="16" y="20" width="64" height="56" rx="4"/>
+          <path d="M16 36 L80 36"/><path d="M32 14 L32 26 M64 14 L64 26"/>
+          <path d="M28 48 L36 48 M44 48 L52 48 M60 48 L68 48"/>
+          <path d="M28 62 L36 62 M44 62 L52 62"/>
+          <circle cx="64" cy="62" r="4"/>
+        </svg>
       </div>
-      <div class="pmeta" id="pMeta"></div>
-      <div class="innrow">
-        <button id="innMinus" aria-label="前のイニング">−</button>
-        <div class="inn"><span id="innNo">1</span>回</div>
-        <button id="innPlus" aria-label="次のイニング">＋</button>
-        <div class="inncount">このイニング<b id="innCount">0</b>球</div>
-      </div>
-      <div class="controls">
-        <button class="main-btn" id="plus1">＋1球</button>
-        <div class="bso hide" id="bsoBox">
-          <div class="bsorow" id="bsoRow"></div>
-          <div class="duo">
-            <button class="main-btn half" data-k="strike">ストライク</button>
-            <button class="main-btn half ballb" data-k="ball">ボール</button>
-          </div>
-          <div class="duo">
-            <button class="sub-btn" data-k="foul">ファウル</button>
-            <button class="sub-btn" data-k="play">インプレー</button>
-            <button class="sub-btn" data-k="out">アウト</button>
-          </div>
-        </div>
-        <div class="subrow three">
-          <button class="sub-btn" id="undo">1球戻す</button>
-          <button class="sub-btn" id="pList">一覧</button>
-          <button class="sub-btn" id="pEdit">投手の設定・削除</button>
-        </div>
-      </div>
-      <div class="bd" id="bd"></div>
-      <button class="modeSw" id="modeSw"></button>
-    </div>
-  </div>
+      <h3>チーム専用アプリの制作</h3>
+      <p>当番・シフト管理、出欠連絡、試合情報の共有、配車の調整 ── チームごとに違う運営のかたちに合わせて、専用のスケジュール管理アプリを設計・制作します。まずは困りごとからご相談ください。</p>
+      <a class="btn" href="https://forms.gle/AiM5eZTKguVXq6if8" target="_blank" rel="noopener">相談してみる</a>
+      <div class="titleblock"><span>CUSTOM ─ 受付中</span><span>B-02</span></div>
+    </article>
 
-  <!-- ================= score ================= -->
-  <div class="view hide" id="viewScore">
-    <div class="scbar">
-      <span class="t" id="scTitle">スコア</span>
-      <button class="pill" id="scSwap">入替</button>
-      <button class="pill" id="scExtra">＋延長</button>
-      <button class="pill hide" id="scLess">−延長</button>
-      <button class="pill" id="scCopy">コピー</button>
-    </div>
-    <div class="scwrap"><table class="sc" id="scTbl"></table></div>
-    <div class="scbtns hide" id="scBtns">
-      <span class="lab" id="scSel"></span>
-      <button class="p" data-sv="+1">＋1</button>
-      <button data-sv="-1">−1</button>
-      <button data-sv="0">0</button>
-      <button data-sv="x">空欄</button>
-    </div>
-    <p class="schint" id="scHint">マスをタップして、下のボタンで入力します。チーム名も直接書き替えられます。</p>
-  </div>
-</div>
+  </section>
 
-<div class="toast" id="toast"></div>
-<div class="veil" id="veil"></div>
+  <h2 class="dim"><span><span class="tick"></span>NAME<span class="tick"></span></span></h2>
+  <section class="origin">
+    <span class="sun-mark" aria-hidden="true">
+      <svg width="34" height="34" viewBox="0 0 56 56" fill="none" stroke="#38657D" stroke-width="4" stroke-linecap="round">
+        <circle cx="28" cy="28" r="10"/>
+        <path d="M40 20 L44 17 M43 32 L48 34 M36 40 L38 44 M20 40 L18 44 M13 32 L8 34 M16 20 L12 17 M24 13 L23 9 M33 13 L34 9"/>
+      </svg>
+    </span>
+    <p><strong>KREATIO</strong> は、ラテン語で「創造」を意味する <em>creatio</em> に由来する造語です。</p>
+    <p>太陽のマークは、何かが生まれる朝の光。図面も、アプリも、整った暮らしも ─ ここから立ち上がっていきます。</p>
+  </section>
 
-<!-- settings sheet -->
-<div class="sheet" id="sheet">
-  <h2>設定</h2>
-  <p class="hint">変更はすぐ反映されます。試合中に試合時間を変えても、経過した分はそのまま残ります。</p>
-  <div class="grp">タイマー</div>
-  <div class="row col"><div class="name">試合時間</div>
-    <div class="steps">
-      <div class="stepbox"><div class="step">
-        <button data-step="-1" data-tgt="sH">−</button>
-        <input class="num" id="sH" type="number" min="0" max="9" inputmode="numeric">
-        <button data-step="1" data-tgt="sH">＋</button></div><div class="cap">時間</div></div>
-      <div class="stepbox"><div class="step">
-        <button data-step="-1" data-tgt="sM">−</button>
-        <input class="num" id="sM" type="number" min="0" max="59" inputmode="numeric">
-        <button data-step="1" data-tgt="sM">＋</button></div><div class="cap">分</div></div>
-    </div></div>
-  <div class="row col"><div class="name">インターバル</div>
-    <div class="steps">
-      <div class="stepbox"><div class="step">
-        <button data-step="-1" data-tgt="sIM">−</button>
-        <input class="num" id="sIM" type="number" min="0" max="59" inputmode="numeric">
-        <button data-step="1" data-tgt="sIM">＋</button></div><div class="cap">分</div></div>
-      <div class="stepbox"><div class="step">
-        <button data-step="-10" data-tgt="sIS">−</button>
-        <input class="num" id="sIS" type="number" min="0" max="50" inputmode="numeric">
-        <button data-step="10" data-tgt="sIS">＋</button></div><div class="cap">秒（10秒ずつ）</div></div>
-    </div></div>
-  <div class="row"><div><div class="name">インターバル終了後</div><div class="sub">試合時間の再開のしかた</div></div>
-    <div class="seg" id="segResume"><button data-v="auto">自動</button><button data-v="manual">手動</button></div></div>
-  <div class="row"><div><div class="name">フリータイマー中</div><div class="sub">試合時間も一緒に止める</div></div>
-    <div class="seg" id="segFreePause"><button data-v="on">止める</button><button data-v="off">止めない</button></div></div>
+  <h2 class="dim"><span><span class="tick"></span>LINKS<span class="tick"></span></span></h2>
+  <section class="links">
+    <a class="btn" href="https://github.com/kreatio-works" rel="me noopener" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#38657D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+      GITHUB
+    </a>
+    <a class="btn" href="https://forms.gle/AiM5eZTKguVXq6if8" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#38657D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7 L12 13 L21 7"/></svg>
+      お問い合わせ
+    </a>
+    <!-- SNSリンクを増やすときは上の .btn をコピーして href とラベルを差し替え -->
+  </section>
 
-  <div class="grp">球数</div>
-  <div class="row"><div><div class="name">1日の上限</div><div class="sub">所属連盟の規定に合わせて変更してください</div></div>
-    <div style="display:flex;align-items:center"><input class="num" id="sDaily" type="number" min="0" max="300" inputmode="numeric"><span class="unit">球</span></div></div>
-  <div class="row"><div><div class="name">連続2日間の上限</div><div class="sub">0にすると使いません</div></div>
-    <div style="display:flex;align-items:center"><input class="num" id="sTwo" type="number" min="0" max="600" inputmode="numeric"><span class="unit">球</span></div></div>
-  <div class="row"><div><div class="name">数え方</div><div class="sub">BSO連動は投球ごとに種類のボタンを押します</div></div>
-    <div class="seg" id="segBso"><button data-v="off">シンプル</button><button data-v="on">BSO連動</button></div></div>
-  <div class="row"><div><div class="name">残り表示に切り替える球数</div><div class="sub">残りがこの数を切ると、残り球数を大きく表示します</div></div>
-    <div style="display:flex;align-items:center"><input class="num" id="sWarn" type="number" min="0" max="99" inputmode="numeric"><span class="unit">球</span></div></div>
 
-  <div class="grp">知らせかた</div>
-  <div class="row"><div><div class="name">音で知らせる</div></div>
-    <div class="seg" id="segSound"><button data-v="on">オン</button><button data-v="off">オフ</button></div></div>
-  <div class="row"><div><div class="name">振動で知らせる</div><div class="sub">対応端末のみ</div></div>
-    <div class="seg" id="segVib"><button data-v="on">オン</button><button data-v="off">オフ</button></div></div>
-  <div class="row"><div><div class="name">画面を常時オンにする</div><div class="sub">計測中は消灯しません</div></div>
-    <div class="seg" id="segWake"><button data-v="on">オン</button><button data-v="off">オフ</button></div></div>
-  <div class="grp">案内</div>
-  <div class="row"><div><div class="name">使い方を見る</div>
-    <div class="sub">配布用の説明ページが開きます</div></div>
-    <a class="pill" href="guide.html" target="_blank" rel="noopener">開く</a></div>
+  <!-- 実績セクション: チラシ画像(ぼかし済み)と公開アプリが揃ったら有効化
+  <h2 class="dim"><span><span class="tick"></span>WORKS<span class="tick"></span></span></h2>
+  <section class="sheets">
+    <article class="sheet">
+      <div class="fig"><img src="works-flyer.png" alt="野球クラブ チラシ" style="width:100%;display:block"></div>
+      <h3>野球クラブ 募集チラシ</h3>
+      <p>体験会の集客チラシをデザイン。手に取った保護者が知りたい順に情報を並べ替えました。</p>
+      <div class="titleblock"><span>FLYER</span><span>W-01</span></div>
+    </article>
+  </section>
+  -->
 
-  <div class="grp">記録の保存</div>
-  <div class="row"><div><div class="name" id="storeName">この端末に保存中</div>
-    <div class="sub" id="storeSub">投手・球数・設定はこの端末のブラウザにだけ残ります</div></div>
-    <button class="pill" id="backup">書き出す</button></div>
-  <div class="grp">リセット</div>
-  <button class="danger" id="rToday">今日をまるごとリセット</button>
-  <button class="danger" id="rWipe">投手をすべて削除する</button>
-  <p class="note">「今日をまるごとリセット」は今日の時刻・スコア・球数・試合番号を消してやり直します。
-    投手の登録と昨日までの記録は残ります。</p>
-  <button class="close" id="close">閉じる</button>
-  <p style="text-align:center;font-size:11px;color:var(--soft);margin-top:12px">
-    制作：<a href="https://kreatio-works.github.io/" target="_blank" rel="noopener"
-    style="color:var(--steel);font-weight:700">KREATIO works</a>　／　版：2026-08-23m</p>
-</div>
+</main>
 
-<!-- pitcher sheet -->
-<div class="sheet" id="psheet">
-  <h2 id="psTitle">投手の設定</h2>
-  <p class="hint">連投の日は、前日までの球数をここに入れておくと合計で判定します。</p>
-  <div class="row"><div class="name">名前</div><input class="txt" id="psName" placeholder="山田"></div>
-  <div class="row"><div><div class="name">どちらの投手</div><div class="sub">相手投手も球数を数えられます</div></div>
-    <div class="seg" id="psTeam"><button data-v="own">自チーム</button><button data-v="opp">相手</button></div></div>
-  <div class="row"><div><div class="name">昨日</div><div class="sub" id="psL1"></div></div>
-    <div style="display:flex;align-items:center"><input class="num" id="psD1" type="number" min="0" max="300" inputmode="numeric"><span class="unit">球</span></div></div>
-  <div class="row"><div><div class="name">一昨日</div><div class="sub" id="psL2"></div></div>
-    <div style="display:flex;align-items:center"><input class="num" id="psD2" type="number" min="0" max="300" inputmode="numeric"><span class="unit">球</span></div></div>
-  <button class="close" id="psSave">保存</button>
-  <button class="danger" id="psDel">この投手を削除</button>
-</div>
-
-<div class="sheet" id="ssheet">
-  <h2>試合のまとめ</h2>
-  <div class="datenav">
-    <button class="mini" id="sumPrev" aria-label="前の日">‹</button>
-    <div class="d" id="sumDate"></div>
-    <button class="mini" id="sumNext" aria-label="次の日">›</button>
-    <button class="pill" id="sumCopy">コピー</button>
-  </div>
-  <div class="wrap" id="sumWrap"></div>
-  <div class="note" id="sumNote"></div>
-  <button class="close" id="sumClose">閉じる</button>
-  <div id="resetArea">
-    <div class="grp">次の試合に向けて</div>
-    <button class="close" id="rNew" style="background:var(--grass)">新しい試合を始める</button>
-    <p class="note" id="resetNote">前の試合の記録を保存して、時刻・スコア・イニングを新しくします。
-      球数は1日の上限を数えるため合算のまま。やり直し用のリセットは⚙設定にあります。</p>
-  </div>
-</div>
-
-<div class="sheet" id="fsheet">
-  <h2>フリータイマー</h2>
-  <p class="hint">計測にすると0から数え上げます。時間を選ぶとカウントダウンになり、0でお知らせします。</p>
-  <div class="chipset" id="frPresets">
-    <button data-ms="0">計測</button>
-    <button data-ms="60000">1分</button>
-    <button data-ms="120000">2分</button>
-    <button data-ms="180000">3分</button>
-    <button data-ms="300000">5分</button>
-    <button data-ms="600000">10分</button>
-  </div>
-  <div class="row col"><div><div class="name">その他の時間</div><div class="sub">0分0秒にすると計測になります</div></div>
-    <div class="steps">
-      <div class="stepbox"><div class="step">
-        <button data-step="-1" data-tgt="frM">−</button>
-        <input class="num" id="frM" type="number" min="0" max="59" inputmode="numeric">
-        <button data-step="1" data-tgt="frM">＋</button></div><div class="cap">分</div></div>
-      <div class="stepbox"><div class="step">
-        <button data-step="-10" data-tgt="frS">−</button>
-        <input class="num" id="frS" type="number" min="0" max="50" inputmode="numeric">
-        <button data-step="10" data-tgt="frS">＋</button></div><div class="cap">秒（10秒ずつ）</div></div>
-    </div></div>
-  <button class="close" id="frClose">閉じる</button>
-</div>
-
-<script>
-window.addEventListener('error',e=>{
-  console.error('[アプリ内エラー]',e.message,e.filename||'',e.lineno||'');
-});
-window.addEventListener('unhandledrejection',e=>{
-  console.error('[アプリ内エラー(promise)]',e.reason);
-});
-const SKEY='baseball-timer-settings-v1', GKEY='baseball-timer-state-v1', PKEY='baseball-pitch-v1',
-      CKEY='baseball-score-v1';
-const S={gameMs:120*60000,itvMs:5*60000,resume:'auto',sound:'on',vib:'on',wake:'on',daily:80,twoDay:0,warn:10,
-         freeMs:180000,freePause:'off',bso:'off'};
-
-let elapsed=0,running=false,last=0,overNotified=false;
-let itvElapsed=0,itvRunning=false,itvDone=false,wasRunning=false;
-let frElapsed=0,frRunning=false,frWasRunning=false;
-let startAt=null,endAt=null;
-let armed=false,armTimer=null,wakeLock=null,ac=null,toastTimer=null,delArmed=false,delTimer=null;
-let P={list:[],sel:null,inning:1},editId=null;
-let SC={days:{}},scPos=null;
-
-const $=id=>document.getElementById(id);
-
-/* ---------- storage ---------- */
-/* 保存先：まず端末のブラウザ保存（localStorage）。使えない環境ではプレビュー用の保存に退避する */
-let storeMode='memory';const mem={};
-async function put(k,v){
-  const t=JSON.stringify(v);
-  try{localStorage.setItem(k,t);storeMode='local';return;}catch(e){}
-  try{if(window.storage){await window.storage.set(k,t);storeMode='host';return;}}catch(e){}
-  mem[k]=t;
-}
-async function get(k){
-  try{const v=localStorage.getItem(k);if(v!==null){storeMode='local';return JSON.parse(v);}
-      storeMode='local';}catch(e){}
-  try{if(window.storage){const r=await window.storage.get(k);if(r?.value){storeMode='host';return JSON.parse(r.value);}}}catch(e){}
-  if(mem[k])return JSON.parse(mem[k]);
-  return null;
-}
-function saveState(){put(GKEY,{elapsed,running,itvElapsed,itvRunning,itvDone,wasRunning,
-  frElapsed,frRunning,frWasRunning,startAt,endAt,at:Date.now()});}
-function savePitch(){put(PKEY,P);}
-function saveScore(){put(CKEY,SC);}
-
-/* ---------- utils ---------- */
-function fmt(ms){const neg=ms<0;ms=Math.abs(ms);const t=Math.floor(ms/1000),h=Math.floor(t/3600),
-  m=Math.floor(t%3600/60),s=t%60,p=n=>String(n).padStart(2,'0');
-  return (neg?'+':'')+(h>0?h+':'+p(m)+':'+p(s):p(m)+':'+p(s));}
-function hhmm(ms){if(!ms)return null;const d=new Date(ms),p=n=>String(n).padStart(2,'0');return p(d.getHours())+':'+p(d.getMinutes());}
-function dkey(off){const d=new Date();d.setDate(d.getDate()+(off||0));
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function dlabel(off){const d=new Date();d.setDate(d.getDate()+(off||0));
-  return (d.getMonth()+1)+'/'+d.getDate()+'('+'日月火水木金土'[d.getDay()]+')';}
-function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');
-  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1700);}
-
-/* ---------- sound ---------- */
-function beep(times){
-  if(S.vib==='on'&&navigator.vibrate)navigator.vibrate(times>2?[220,120,220,120,420]:times>1?[220,120,220]:[160]);
-  if(S.sound!=='on')return;
-  try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();
-    for(let i=0;i<times;i++){const o=ac.createOscillator(),g=ac.createGain(),t0=ac.currentTime+i*0.34;
-      o.type='square';o.frequency.value=i===times-1?660:880;
-      g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(0.28,t0+0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001,t0+0.28);
-      o.connect(g);g.connect(ac.destination);o.start(t0);o.stop(t0+0.3);}}catch(e){}
-}
-function unlockAudio(){if(S.sound!=='on')return;
-  try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();}catch(e){}}
-async function syncWake(){
-  const want=S.wake==='on'&&(running||itvRunning||frRunning);
-  try{if(want&&!wakeLock&&navigator.wakeLock){wakeLock=await navigator.wakeLock.request('screen');
-      wakeLock.addEventListener('release',()=>{wakeLock=null;});}
-    else if(!want&&wakeLock){await wakeLock.release();wakeLock=null;}}catch(e){}
-}
-
-/* ---------- timer ---------- */
-function startGame(){if(running)return;if(startAt===null)startAt=Date.now();
-  endAt=null;running=true;last=performance.now();itvDone=false;syncWake();saveState();renderT();}
-function pauseGame(){if(!running)return;tick();running=false;syncWake();saveState();renderT();}
-function finishGame(){if(startAt===null)return;tick();running=false;itvRunning=false;itvDone=false;
-  endAt=Date.now();syncWake();saveState();renderT();toast('終了時刻を記録しました');
-  if(P.list.some(p=>dayTotal(p,dkey(0))>0)||scoreHas(SC.days[dkey(0)]))setTimeout(openSummary,400);}
-function resetGame(){running=false;elapsed=0;overNotified=false;itvRunning=false;itvElapsed=0;itvDone=false;
-  startAt=null;endAt=null;syncWake();saveState();renderT();}
-function startInterval(){wasRunning=running;if(running)pauseGame();
-  itvElapsed=0;itvRunning=true;itvDone=false;syncWake();saveState();renderT();}
-function endInterval(byUser){itvRunning=false;itvElapsed=0;
-  if(byUser||S.resume==='auto'){itvDone=false;if(wasRunning)startGame();}else itvDone=true;
-  syncWake();saveState();renderT();}
-function startFree(){
-  if(frRunning)return;
-  if(S.freeMs>0&&frElapsed>=S.freeMs)frElapsed=0;
-  if(S.freePause==='on'){frWasRunning=running;if(running)pauseGame();}
-  frRunning=true;syncWake();saveState();renderT();
-}
-function stopFree(resume){
-  if(!frRunning)return;
-  frRunning=false;
-  if(resume&&S.freePause==='on'&&frWasRunning&&!itvRunning)startGame();
-  frWasRunning=false;syncWake();saveState();renderT();
-}
-function resetFree(){frRunning=false;frElapsed=0;frWasRunning=false;syncWake();saveState();renderT();}
-
-function tick(){
-  const now=performance.now(),d=now-last;last=now;
-  if(running){elapsed+=d;
-    if(elapsed<S.gameMs)overNotified=false;
-    else if(!overNotified){overNotified=true;beep(3);}}
-  if(itvRunning){itvElapsed+=d;if(itvElapsed>=S.itvMs){beep(2);endInterval(false);}}
-  if(frRunning){frElapsed+=d;
-    if(S.freeMs>0&&frElapsed>=S.freeMs){frElapsed=S.freeMs;beep(2);stopFree(true);}}
-}
-setInterval(()=>{tick();renderT();},200);
-setInterval(()=>{if(running||itvRunning||frRunning)saveState();},5000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){tick();renderT();syncWake();}});
-
-function renderT(){
-  const rem=S.gameMs-elapsed,over=rem<0,ended=endAt!==null;
-  $('clock').textContent=fmt(rem);
-  $('clock').classList.toggle('paused',!running&&!over);
-  $('clock').classList.toggle('over',over);
-  $('track').classList.toggle('over',over);
-  const pct=S.gameMs>0?Math.min(100,elapsed/S.gameMs*100):100;
-  $('fill').style.width=pct+'%';$('base').style.left=pct+'%';
-  const st=$('state');
-  if(itvRunning)st.textContent='インターバル中 — 試合時間は停止';
-  else if(itvDone)st.textContent='再開待ち — 開始を押してください';
-  else if(ended)st.textContent='試合終了 — 所要 '+fmt(elapsed);
-  else if(over)st.textContent='試合時間終了からの経過';
-  else if(running)st.textContent='残り時間';
-  else st.textContent=elapsed>0?'一時停止中':'残り時間';
-  $('main').textContent=running?'一時停止':(elapsed>0?'再開':'開始');
-  $('main').className='main-btn'+(running?' running':((itvDone||itvRunning)?' waiting':''));
-  $('finish').textContent=ended?'新しい試合へ':'試合終了';
-  $('finish').disabled=!ended&&startAt===null;
-  $('itv').classList.toggle('on',itvRunning);
-  $('itvClock').textContent=fmt(Math.max(0,S.itvMs-itvElapsed));
-  $('itvLabel').textContent=itvRunning?'インターバル中':'インターバル';
-  $('itvBtn').textContent=itvRunning?'終了':'開始';
-  const done=S.freeMs>0&&frElapsed>=S.freeMs;
-  $('fr').classList.toggle('on',frRunning);
-  $('frClock').textContent=fmt(S.freeMs>0?Math.max(0,S.freeMs-frElapsed):frElapsed);
-  $('frClock').classList.toggle('done',done&&!frRunning);
-  $('frLabel').innerHTML=frRunning?(S.freeMs>0?'カウントダウン中':'計測中')
-    :'フリータイマー<span class="edit">'+(S.freeMs>0?'タップで変更':'計測・タップで変更')+'</span>';
-  $('frBtn').textContent=frRunning?'停止':(done?'もう一度':(frElapsed>0?'再開':'開始'));
-  $('frReset').classList.toggle('hide',frRunning||frElapsed===0);
-
-  const a=hhmm(startAt),b=hhmm(endAt);
-  $('logStart').textContent=a||'—:—';$('logStart').classList.toggle('empty',!a);
-  $('logEnd').textContent=b||'—:—';$('logEnd').classList.toggle('empty',!b);
-  if(!armed)$('reset').textContent='リセット';
-
-  let lab='残り',val=fmt(rem),cls='';
-  if(itvRunning){lab='中断';val=fmt(Math.max(0,S.itvMs-itvElapsed));cls='clay';}
-  else if(over){lab='超過';cls='red';}
-  else if(ended){lab='終了';val=fmt(elapsed);}
-  else if(!running&&elapsed>0)lab='停止中';
-  $('msTimeLab').textContent=lab;
-  $('msTimeVal').textContent=val;
-  $('msTimeVal').className=cls;
-
-  const pp=pitcher();
-  if(pp){
-    $('msPitchLab').textContent=(pp.team==='opp'?'相手 ':'')+pp.name;
-    $('msPitchVal').textContent=dayTotal(pp,dkey(0));
-  }
-  const gsl2=dayGames(dkey(0)),g2=gsl2.length?gsl2[gsl2.length-1]:null;
-  $('msScoreA').textContent=g2?scTot(g2.a.r):0;
-  $('msScoreB').textContent=g2?scTot(g2.b.r):0;
-
-  const showT=curTab!=='timer',showP=curTab!=='pitch'&&!!pp,showS=curTab!=='score';
-  $('msTime').classList.toggle('hide',!showT);
-  $('msPitch').classList.toggle('hide',!showP);
-  $('msScore').classList.toggle('hide',!showS);
-  $('msSep1').classList.toggle('hide',!(showT&&(showP||showS)));
-  $('msSep2').classList.toggle('hide',!(showP&&showS));
-  $('miniT').classList.toggle('hide',!showT&&!showP&&!showS);
-}
-
-/* ---------- pitch counter ---------- */
-function pitcher(){return P.list.find(p=>p.id===P.sel)||null;}
-function migDay(d){if(d&&!d.games){d.games=[{innings:d.innings||{}}];delete d.innings;}return d;}
-function dayTotal(p,key){const d=p.days[key];if(!d)return 0;
-  if(typeof d.manual==='number')return d.manual;
-  const gs=d.games||[{innings:d.innings||{}}];
-  return gs.reduce((a,g)=>a+Object.values(g.innings||{}).reduce((x,y)=>x+y,0),0);}
-function gameTotal(p,key,g){const d=p.days[key];if(!d)return 0;
-  if(typeof d.manual==='number')return g===1?d.manual:0;
-  const gs=d.games||[{innings:d.innings||{}}],gm=gs[g-1];
-  return gm?Object.values(gm.innings||{}).reduce((x,y)=>x+y,0):0;}
-function gInnings(p,key,g){const d=p.days[key];if(!d)return{};
-  const gs=d.games||[{innings:d.innings||{}}],gm=gs[g-1];
-  return gm?(gm.innings||{}):{};}
-function dayGameCount(key){
-  let n=1;
-  P.list.forEach(p=>{const d=p.days[key];if(d&&d.games&&d.games.length>n)n=d.games.length;});
-  const gs=dayGames(key);if(gs.length>n)n=gs.length;
-  if(key===dkey(0)&&P.game>n)n=P.game;
-  return n;}
-function ensureDay(p,key){
-  let d=p.days[key];
-  if(!d)d=p.days[key]={games:[],manual:null};
-  else migDay(d);
-  return d;}
-function checkGameDate(){
-  if(P.gameDate!==dkey(0)){P.game=1;P.gameDate=dkey(0);}}
-function addPitch(kind){
-  const p=pitcher();if(!p)return;unlockAudio();
-  P.bso=P.bso||{b:0,s:0,o:0};
-  checkGameDate();
-  const d=ensureDay(p,dkey(0));
-  const before=S.daily-dayTotal(p,dkey(0));
-  p.stack=p.stack||[];
-  p.stack.push({g:P.game,i:P.inning,b:P.bso.b,s:P.bso.s,o:P.bso.o});
-  if(p.stack.length>200)p.stack.shift();
-  while(d.games.length<P.game)d.games.push({innings:{}});
-  const inn=d.games[P.game-1].innings;
-  inn[P.inning]=(inn[P.inning]||0)+1;
-  d.manual=null;
-  if(S.bso==='on'){
-    let msg='';
-    if(kind==='strike'){P.bso.s++;
-      if(P.bso.s>=3){P.bso.b=0;P.bso.s=0;P.bso.o++;msg='三振';
-        if(P.bso.o>=3){P.bso.o=0;msg='三振・チェンジ';}}}
-    else if(kind==='ball'){P.bso.b++;
-      if(P.bso.b>=4){P.bso.b=0;P.bso.s=0;msg='四球';}}
-    else if(kind==='foul'){if(P.bso.s<2)P.bso.s++;}
-    else if(kind==='play'){P.bso.b=0;P.bso.s=0;}
-    else if(kind==='out'){P.bso.b=0;P.bso.s=0;P.bso.o++;msg='アウト';
-      if(P.bso.o>=3){P.bso.o=0;msg='スリーアウト・チェンジ';}}
-    if(msg)toast(msg);
-  }
-  const after=S.daily-dayTotal(p,dkey(0));
-  if(S.daily>0){
-    if(before>0&&after<=0)beep(3);
-    else if(before>=S.warn&&after<S.warn)beep(1);
-  }
-  savePitch();renderP();
-}
-function undoPitch(){
-  const p=pitcher();if(!p)return;
-  const d=ensureDay(p,dkey(0));
-  const e=(p.stack&&p.stack.length)?p.stack.pop():null;
-  const g=(e&&typeof e==='object'&&e.g)?e.g:P.game;
-  const inn=e===null?P.inning:(typeof e==='number'?e:e.i);
-  const m=(d.games[g-1]||{}).innings||{};
-  if(m[inn]){
-    m[inn]--;if(!m[inn])delete m[inn];
-    if(e&&typeof e==='object')P.bso={b:e.b,s:e.s,o:e.o};
-    savePitch();renderP();
-  }else toast('戻せる球がありません');
-}
-function renderP(){
-  const list=$('chips');list.innerHTML='';
-  [...P.list].sort((x,y)=>((x.team==='opp')-(y.team==='opp'))).forEach(p=>{
-    const b=document.createElement('button');
-    b.className='chip'+(p.team==='opp'?' opp':'')+(p.id===P.sel?' sel':'');
-    b.innerHTML=p.name+'<span class="n">'+dayTotal(p,dkey(0))+'</span>';
-    b.onclick=()=>{P.sel=p.id;savePitch();renderP();};
-    list.appendChild(b);
-  });
-  const add=document.createElement('button');
-  add.className='chip add';add.textContent='＋ 投手';
-  add.onclick=()=>openPitcher(null);
-  list.appendChild(add);
-
-  const gsl0=dayGames(dkey(0)),gcur=gsl0.length?gsl0[gsl0.length-1]:null;
-  $('psNameA').textContent=gcur?gcur.a.name:'自チーム';
-  $('psNameB').textContent=gcur?gcur.b.name:'相手';
-  $('psValA').textContent=gcur?scTot(gcur.a.r):0;
-  $('psValB').textContent=gcur?scTot(gcur.b.r):0;
-
-  const p=pitcher();
-  $('pEmpty').classList.toggle('hide',!!p);
-  $('pMain').classList.toggle('hide',!p);
-  if(!p)return;
-
-  checkGameDate();
-  const today=dayTotal(p,dkey(0)),y1=dayTotal(p,dkey(-1)),y2=dayTotal(p,dkey(-2));
-  const innMap=gInnings(p,dkey(0),P.game);
-  const innNow=innMap[P.inning]||0;
-  const rem=S.daily>0?S.daily-today:null;
-  const low=rem!==null&&rem<S.warn;
-
-  $('pName').innerHTML=p.name+'<i>投手</i>';
-  $('pInn').textContent=innNow;
-  $('pTotal').textContent=today;
-  $('pTwo').classList.toggle('hide',low);
-  $('pOne').classList.toggle('hide',!low);
-  if(low){
-    $('pOne').className='pone'+(rem<=0?' stop':'');
-    $('pOneLab').textContent=rem<=0?'上限を超えています':'残り';
-    $('pRemain').textContent=Math.abs(rem);
-    $('pOneDet').innerHTML='この回 <b>'+innNow+'</b>球 ・ 累計 <b>'+today+'</b>球';
-  }
-
-  let meta='本日 <b>'+today+'</b>球'+(S.daily>0?' / '+S.daily+'球':'');
-  if(P.game>1)meta='第'+P.game+'試合 <b>'+gameTotal(p,dkey(0),P.game)+'</b>球 ・ '+meta;
-  if(y1||y2)meta+='<br>昨日 <b>'+y1+'</b>球・一昨日 <b>'+y2+'</b>球';
-  if(S.twoDay>0){
-    const two=today+y1;
-    meta+='<br>2日間 <b>'+two+'</b>球 / '+S.twoDay+'球'+(two>S.twoDay?' ⚠ 超過':'');
-  }
-  if(y1>0&&y2>0)meta+='<br>⚠ 3日連続の登板です';
-  $('pMeta').innerHTML=meta;
-
-  $('innNo').textContent=P.inning;
-  $('innCount').textContent=innNow;
-  const bd=$('bd');bd.innerHTML='';
-  Object.keys(innMap).map(Number).sort((x,y)=>x-y).forEach(k=>{
-    const sp=document.createElement('span');sp.innerHTML=k+'回<b>'+innMap[k]+'</b>';bd.appendChild(sp);
-  });
-  const stop=rem!==null&&rem<=0;
-  $('plus1').className='main-btn'+(stop?' stop':'')+(S.bso==='on'?' hide':'');
-  $('bsoBox').classList.toggle('hide',S.bso!=='on');
-  if(S.bso==='on'){
-    P.bso=P.bso||{b:0,s:0,o:0};
-    const dots=(n,max,cls)=>Array.from({length:max},(_,k)=>
-      '<span class="dot '+cls+(k<n?' on':'')+'"></span>').join('');
-    $('bsoRow').innerHTML=
-      '<span class="set"><b>B</b>'+dots(P.bso.b,3,'b')+'</span>'
-     +'<span class="set"><b>S</b>'+dots(P.bso.s,2,'s')+'</span>'
-     +'<span class="set" id="oTap" style="cursor:pointer"><b>O</b>'+dots(P.bso.o,2,'o')+'</span>';
-    $('oTap').onclick=()=>{P.bso.o=(P.bso.o+1)%3;
-      if(P.bso.o===0){P.bso.b=0;P.bso.s=0;toast('チェンジ');}
-      savePitch();renderP();};
-    document.querySelectorAll('#bsoBox .half').forEach(b=>b.classList.toggle('stop',stop));
-  }
-  $('modeSw').textContent='数え方：'+(S.bso==='on'?'BSO連動':'シンプル')+'（タップで切替）';
-}
-
-/* ---------- score ---------- */
-function newGame(){return {a:{name:'自チーム',r:[]},b:{name:'相手',r:[]},n:7,t:null};}
-function scDayFull(){
-  const k=dkey(0);
-  let d=SC.days[k];
-  if(!d)d=SC.days[k]={games:[newGame()]};
-  else if(!d.games)d=SC.days[k]={games:[d]};
-  return d;
-}
-function scDay(){
-  const d=scDayFull(),g=d.games[d.games.length-1];
-  while(g.a.r.length<g.n)g.a.r.push(null);
-  while(g.b.r.length<g.n)g.b.r.push(null);
-  return g;
-}
-function dayGames(k){const d=SC.days[k];if(!d)return[];return d.games?d.games:[d];}
-function gameHas(g){return g&&(g.a.r.some(v=>v!==null)||g.b.r.some(v=>v!==null));}
-function scTot(r){return r.reduce((a,v)=>a+(v||0),0);}
-function renderS(){
-  const d=scDay();
-  const gn=scDayFull().games.length;
-  $('scTitle').textContent='スコア'+(gn>1?'（第'+gn+'試合）':'');
-  let h='<tr><th class="nm"></th>';
-  for(let i=0;i<d.n;i++)h+='<th>'+(i+1)+'</th>';
-  h+='<th>計</th></tr>';
-  for(const row of ['a','b']){
-    h+='<tr><td><input class="scname" data-row="'+row+'" value="'+d[row].name.replace(/"/g,'&quot;')+'"></td>';
-    for(let i=0;i<d.n;i++){
-      const v=d[row].r[i];
-      const sel=scPos&&scPos.row===row&&scPos.i===i;
-      h+='<td class="cell'+(v===null?' blank':'')+(sel?' sel':'')+'" data-row="'+row+'" data-i="'+i+'">'
-        +(v===null?'–':v)+'</td>';
-    }
-    h+='<td class="r">'+scTot(d[row].r)+'</td></tr>';
-  }
-  $('scTbl').innerHTML=h;
-  $('scBtns').classList.toggle('hide',!scPos);
-  $('scLess').classList.toggle('hide',d.n<=7);
-  if(scPos)$('scSel').textContent=d[scPos.row].name+'　'+(scPos.i+1)+'回';
-  $('scTbl').querySelectorAll('.cell').forEach(c=>{
-    c.onclick=()=>{
-      const np={row:c.dataset.row,i:+c.dataset.i};
-      scPos=(scPos&&scPos.row===np.row&&scPos.i===np.i)?null:np;
-      renderS();
-    };
-  });
-  $('scTbl').querySelectorAll('.scname').forEach(inp=>{
-    inp.oninput=()=>{scDay()[inp.dataset.row].name=inp.value;saveScore();};
-    inp.onblur=renderS;
-  });
-}
-$('scBtns').onclick=e=>{
-  const b=e.target.closest('button');if(!b||!scPos)return;
-  const d=scDay(),r=d[scPos.row].r,v=r[scPos.i];
-  if(b.dataset.sv==='+1')r[scPos.i]=(v===null?0:v)+1;
-  else if(b.dataset.sv==='-1')r[scPos.i]=v===null?null:Math.max(0,v-1);
-  else if(b.dataset.sv==='0')r[scPos.i]=0;
-  else r[scPos.i]=null;
-  saveScore();renderS();
-};
-$('scSwap').onclick=()=>{const d=scDay();[d.a,d.b]=[d.b,d.a];scPos=null;saveScore();renderS();};
-$('scExtra').onclick=()=>{const d=scDay();if(d.n<12){d.n++;saveScore();renderS();}else toast('12回までです');};
-let lessArm=false,lessTm=null;
-function lessReset(){lessArm=false;$('scLess').classList.remove('armed');$('scLess').textContent='−延長';}
-$('scLess').onclick=()=>{
-  const d=scDay(),i=d.n-1;
-  if(d.n<=7)return;
-  const has=d.a.r[i]!==null||d.b.r[i]!==null;
-  if(has&&!lessArm){lessArm=true;$('scLess').classList.add('armed');$('scLess').textContent='得点ごと削除';
-    clearTimeout(lessTm);lessTm=setTimeout(lessReset,3000);return;}
-  clearTimeout(lessTm);lessReset();
-  d.n--;d.a.r.length=d.n;d.b.r.length=d.n;
-  if(scPos&&scPos.i>=d.n)scPos=null;
-  saveScore();renderS();
-};
-function scoreText(){
-  const d=scDay(),gn=scDayFull().games.length;
-  const line=row=>row.name+'　'+row.r.slice(0,d.n).map(v=>v===null?'–':v).join(' ')+'　＝'+scTot(row.r);
-  return keyLabel(dkey(0))+' スコア'+(gn>1?'（第'+gn+'試合）':'')+'\n'+line(d.a)+'\n'+line(d.b);
-}
-$('scCopy').onclick=()=>{navigator.clipboard?.writeText(scoreText())
-  .then(()=>toast('コピーしました'),()=>toast('コピーできませんでした'));};
-
-/* summary sheet */
-let sumDate=null;
-function keyLabel(k){const[y,m,d]=k.split('-').map(Number);const dt=new Date(y,m-1,d);
-  return m+'/'+d+'('+'日月火水木金土'[dt.getDay()]+')';}
-function scoreHas(d){if(!d)return false;const gs=d.games?d.games:[d];return gs.some(gameHas);}
-function dataDates(){
-  const set=new Set();
-  P.list.forEach(p=>Object.keys(p.days||{}).forEach(k=>{if(dayTotal(p,k)>0)set.add(k);}));
-  Object.keys(SC.days||{}).forEach(k=>{if(scoreHas(SC.days[k]))set.add(k);});
-  return[...set].sort();
-}
-function openSummary(){
-  const ds=dataDates();
-  sumDate=ds.includes(dkey(0))?dkey(0):(ds.length?ds[ds.length-1]:dkey(0));
-  renderSummary();$('ssheet').classList.add('open');$('veil').classList.add('open');
-}
-function renderSummary(){
-  const ds=dataDates(),idx=ds.indexOf(sumDate);
-  $('sumDate').textContent=keyLabel(sumDate)+(sumDate===dkey(0)?' 今日':'');
-  $('resetArea').classList.toggle('hide',sumDate!==dkey(0));
-  $('sumPrev').disabled=idx<=0;$('sumNext').disabled=idx<0||idx>=ds.length-1;
-
-  const rows=P.list.filter(p=>dayTotal(p,sumDate)>0);
-  const gs=dayGames(sumDate);
-  const gCount=Math.max(dayGameCount(sumDate),gs.length||1);
-  const multi=gCount>1;
-  let h='';
-
-  const scTable=g=>{
-    let t='<table class="tbl"><tr><th style="text-align:left"></th>';
-    for(let k=0;k<g.n;k++)t+='<th>'+(k+1)+'</th>';
-    t+='<th class="tot">計</th></tr>';
-    for(const row of [g.a,g.b]){
-      t+='<tr><td class="nm">'+row.name+'</td>';
-      for(let k=0;k<g.n;k++){const v=row.r[k];
-        t+='<td class="num'+(v===null?' zero':'')+'">'+(v===null?'–':v)+'</td>';}
-      t+='<td class="tot">'+scTot(row.r)+'</td></tr>';
-    }
-    return t+'</table>';
-  };
-  const mkTable=(list,label,g)=>{
-    const withData=list.filter(p=>gameTotal(p,sumDate,g)>0);
-    if(!withData.length)return'';
-    const inns=new Set();
-    withData.forEach(p=>{if(typeof (p.days[sumDate]||{}).manual!=='number')
-      Object.keys(gInnings(p,sumDate,g)).forEach(k=>{if(gInnings(p,sumDate,g)[k]>0)inns.add(+k);});});
-    const cols=[...inns].sort((x,y)=>x-y);
-    let t='<div class="grp">'+label+'</div><table class="tbl"><tr><th style="text-align:left">投手</th>';
-    cols.forEach(k=>t+='<th>'+k+'回</th>');
-    t+='<th class="tot">計</th></tr>';
-    let grand=0;const colSum={};
-    withData.forEach(p=>{
-      const manual=typeof (p.days[sumDate]||{}).manual==='number';
-      const m=gInnings(p,sumDate,g);
-      t+='<tr><td class="nm">'+p.name+(manual?' <span style="font-size:11px;color:#65727B">手入力</span>':'')+'</td>';
-      cols.forEach(k=>{const n=manual?null:(m[k]||0);
-        colSum[k]=(colSum[k]||0)+(n||0);
-        t+='<td class="num'+(n?'':' zero')+'">'+(n===null?'–':(n||'–'))+'</td>';});
-      const tt=gameTotal(p,sumDate,g);grand+=tt;
-      t+='<td class="tot">'+tt+'</td></tr>';
-    });
-    if(cols.length){
-      t+='<tr class="sum"><td class="nm">合計</td>';
-      cols.forEach(k=>t+='<td class="num">'+(colSum[k]||0)+'</td>');
-      t+='<td class="tot">'+grand+'</td></tr>';
-    }
-    return t+'</table>';
-  };
-
-  for(let g=1;g<=gCount;g++){
-    const sg=gs[g-1];
-    const isCur=(g===gCount)&&sumDate===dkey(0);
-    const t=(sg&&sg.t&&sg.t.s)?sg.t:((isCur&&startAt)?{s:startAt,e:endAt,dur:elapsed}:null);
-    const hasSc=sg&&gameHas(sg);
-    const own=rows.filter(p=>(p.team||'own')!=='opp'),opp=rows.filter(p=>p.team==='opp');
-    const ownT=mkTable(own,multi?'投球数（自チーム）':(opp.some(p=>gameTotal(p,sumDate,g)>0)?'投球数（自チーム）':'投球数'),g);
-    const oppT=mkTable(opp,'投球数（相手）',g);
-    if(!t&&!hasSc&&!ownT&&!oppT)continue;
-    if(multi)h+='<div class="grp" style="font-size:13px;color:var(--ink)">━ 第'+g+'試合</div>';
-    if(t)h+=(multi?'':'<div class="grp">時刻</div>')
-      +'<p style="font-size:14px;font-weight:700;margin-top:6px">開始 '+hhmm(t.s)
-      +'　終了 '+(t.e?hhmm(t.e):'—')+'　（経過 '+fmt(t.dur)+'）</p>';
-    if(hasSc)h+=(multi?'':'<div class="grp">スコア</div>')+scTable(sg);
-    h+=ownT+oppT;
-  }
-  if(!h)h='<p class="hint" style="margin:14px 0">この日の記録はありません。</p>';
-  $('sumWrap').innerHTML=h;
-
-  const notes=[];
-  if(multi&&rows.length)
-    notes.push('1日合計：'+rows.map(p=>p.name+' '+dayTotal(p,sumDate)+'球').join(' ・ '));
-  rows.forEach(p=>{
-    const prev=dayTotal(p,shiftKey(sumDate,-1));
-    if(prev>0)notes.push(p.name+'：前日 '+prev+'球 ・ 2日間で '+(prev+dayTotal(p,sumDate))+'球');
-  });
-  $('sumNote').innerHTML=notes.join('<br>');
-}
-function shiftKey(k,off){const[y,m,d]=k.split('-').map(Number);const dt=new Date(y,m-1,d);
-  dt.setDate(dt.getDate()+off);
-  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');}
-function summaryText(){
-  const rows=P.list.filter(p=>dayTotal(p,sumDate)>0);
-  const gs=dayGames(sumDate);
-  const gCount=Math.max(dayGameCount(sumDate),gs.length||1);
-  const multi=gCount>1;
-  let out=keyLabel(sumDate)+' 試合のまとめ';
-  const pline=(p,g)=>{
-    const manual=typeof (p.days[sumDate]||{}).manual==='number';
-    const m=gInnings(p,sumDate,g),t=gameTotal(p,sumDate,g);
-    const det=manual?'':Object.keys(m).map(Number).sort((x,y)=>x-y).map(k=>k+'回'+m[k]).join(' ');
-    return p.name+'　'+(det?det+'　':'')+'計'+t+'球';
-  };
-  let any=false;
-  for(let g=1;g<=gCount;g++){
-    const sg=gs[g-1];
-    const isCur=(g===gCount)&&sumDate===dkey(0);
-    const t=(sg&&sg.t&&sg.t.s)?sg.t:((isCur&&startAt)?{s:startAt,e:endAt,dur:elapsed}:null);
-    const hasSc=sg&&gameHas(sg);
-    const ownR=rows.filter(p=>(p.team||'own')!=='opp'&&gameTotal(p,sumDate,g)>0);
-    const oppR=rows.filter(p=>p.team==='opp'&&gameTotal(p,sumDate,g)>0);
-    if(!t&&!hasSc&&!ownR.length&&!oppR.length)continue;
-    any=true;
-    if(multi)out+='\n━ 第'+g+'試合';
-    if(t)out+='\n開始 '+hhmm(t.s)+'　終了 '+(t.e?hhmm(t.e):'—')+'（経過 '+fmt(t.dur)+'）';
-    if(hasSc){
-      const line=row=>row.name+'　'+row.r.slice(0,sg.n).map(v=>v===null?'–':v).join(' ')+'　＝'+scTot(row.r);
-      out+='\n'+line(sg.a)+'\n'+line(sg.b);
-    }
-    if(ownR.length){
-      ownR.forEach(p=>out+='\n'+pline(p,g));
-      out+='\nチーム合計 '+ownR.reduce((a,p)=>a+gameTotal(p,sumDate,g),0)+'球';
-    }
-    if(oppR.length){
-      out+='\n― 相手 ―';
-      oppR.forEach(p=>out+='\n'+pline(p,g));
-    }
-  }
-  if(multi&&rows.length)
-    out+='\n1日合計： '+rows.map(p=>p.name+' '+dayTotal(p,sumDate)+'球').join(' / ');
-  if(!any)out+='\n記録なし';
-  out+='\n――\n⚾野球タイマー by KREATIO works\nhttps://kreatio-works.github.io/forBaseball_timer/';
-  return out;
-}
-$('sumPrev').onclick=()=>{const ds=dataDates(),i=ds.indexOf(sumDate);if(i>0){sumDate=ds[i-1];renderSummary();}};
-$('sumNext').onclick=()=>{const ds=dataDates(),i=ds.indexOf(sumDate);if(i>=0&&i<ds.length-1){sumDate=ds[i+1];renderSummary();}};
-$('sumCopy').onclick=()=>{navigator.clipboard?.writeText(summaryText())
-  .then(()=>toast('コピーしました'),()=>toast('コピーできませんでした'));};
-$('sumClose').onclick=closeSheets;
-$('pList').onclick=openSummary;
-
-/* 2度押しの確認つきボタン */
-function arm(btn,label,run){
-  let on=false,tm=null;
-  btn.onclick=()=>{
-    if(!on){on=true;btn.classList.add('armed');btn.textContent='もう一度押すと実行';
-      clearTimeout(tm);tm=setTimeout(()=>{on=false;btn.classList.remove('armed');btn.textContent=label;},3500);}
-    else{clearTimeout(tm);on=false;btn.classList.remove('armed');btn.textContent=label;run();}
-  };
-}
-arm($('rNew'),'新しい試合を始める',()=>{
-  navigator.clipboard?.writeText(summaryText()).catch(()=>{});
-  const day=scDayFull(),cur=scDay();
-  cur.t={s:startAt,e:endAt,dur:elapsed};
-  const ng=newGame();ng.a.name=cur.a.name;ng.b.name=cur.b.name;
-  day.games.push(ng);saveScore();scPos=null;
-  resetGame();
-  checkGameDate();P.game=(P.game||1)+1;P.inning=1;P.bso={b:0,s:0,o:0};
-  P.list.forEach(pp=>pp.stack=[]);savePitch();
-  renderS();renderP();closeSheets();
-  toast('第'+P.game+'試合の準備ができました（前のまとめはコピー済み）');
-});
-function resetToday(){
-  P.list.forEach(p=>{delete p.days[dkey(0)];p.stack=[];});
-  P.inning=1;P.game=1;P.gameDate=dkey(0);P.bso={b:0,s:0,o:0};
-  delete SC.days[dkey(0)];scPos=null;
-  resetGame();
-  savePitch();saveScore();
-}
-arm($('rToday'),'今日をまるごとリセット',()=>{
-  resetToday();
-  renderP();renderS();if(sumDate)renderSummary();
-  closeSheets();toast('今日の記録をすべてリセットしました');
-});
-arm($('rWipe'),'投手をすべて削除する',()=>{
-  P={list:[],sel:null,inning:1,game:P.game||1,gameDate:P.gameDate||dkey(0),bso:{b:0,s:0,o:0}};
-  savePitch();renderP();closeSheets();toast('投手をすべて削除しました');
-});
-
-/* pitcher sheet */
-let psTeamVal='own';
-$('psTeam').onclick=e=>{const b=e.target.closest('button');if(!b)return;
-  psTeamVal=b.dataset.v;
-  [...$('psTeam').children].forEach(x=>x.classList.toggle('sel',x.dataset.v===psTeamVal));};
-function openPitcher(id){
-  editId=id;
-  const p=id?P.list.find(x=>x.id===id):null;
-  $('psTitle').textContent=p?'投手の設定':'投手を追加';
-  $('psName').value=p?p.name:'';
-  psTeamVal=p?(p.team||'own'):'own';
-  [...$('psTeam').children].forEach(x=>x.classList.toggle('sel',x.dataset.v===psTeamVal));
-  $('psL1').textContent=dlabel(-1);$('psL2').textContent=dlabel(-2);
-  $('psD1').value=p?dayTotal(p,dkey(-1)):0;
-  $('psD2').value=p?dayTotal(p,dkey(-2)):0;
-  $('psDel').style.display=p?'block':'none';
-  delArmed=false;$('psDel').classList.remove('armed');$('psDel').textContent='この投手を削除';
-  $('psheet').classList.add('open');$('veil').classList.add('open');
-}
-$('psSave').onclick=()=>{
-  const name=($('psName').value||'').trim()||'投手';
-  const n1=Math.max(0,parseInt($('psD1').value,10)||0),n2=Math.max(0,parseInt($('psD2').value,10)||0);
-  let p=editId?P.list.find(x=>x.id===editId):null;
-  if(!p){p={id:'p'+Date.now(),name:name,days:{},stack:[]};P.list.push(p);P.sel=p.id;}
-  p.name=name;p.team=psTeamVal;
-  ensureDay(p,dkey(-1)).manual=n1;
-  ensureDay(p,dkey(-2)).manual=n2;
-  savePitch();closeSheets();renderP();
-};
-$('psDel').onclick=()=>{
-  if(!delArmed){delArmed=true;$('psDel').classList.add('armed');$('psDel').textContent='もう一度押すと削除';
-    clearTimeout(delTimer);delTimer=setTimeout(()=>{delArmed=false;$('psDel').classList.remove('armed');
-      $('psDel').textContent='この投手を削除';},3000);return;}
-  P.list=P.list.filter(x=>x.id!==editId);
-  if(P.sel===editId)P.sel=P.list.length?P.list[0].id:null;
-  savePitch();closeSheets();renderP();
-};
-$('plus1').onclick=()=>addPitch('plain');
-$('pScore').onclick=e=>{
-  const sb=e.target.closest('[data-sc]');
-  if(sb){
-    const side=sb.dataset.sc[0],plus=sb.dataset.sc.includes('+');
-    const g=scDay();
-    const idx=Math.min(Math.max(P.inning,1),12);
-    if(g.n<idx){g.n=idx;while(g.a.r.length<g.n)g.a.r.push(null);while(g.b.r.length<g.n)g.b.r.push(null);}
-    const r=g[side].r,i2=idx-1,v=r[i2];
-    if(plus)r[i2]=(v==null?0:v)+1;
-    else{if(v>0)r[i2]=v-1;else{toast(idx+'回に得点がありません');return;}}
-    saveScore();renderP();renderS();
-    return;
-  }
-  const nm=e.target.closest('[data-side]');
-  if(nm){const b=[...$('tabs').children].find(x=>x.dataset.t==='score');if(b)b.click();}
-};
-$('bsoBox').onclick=e=>{const b=e.target.closest('button[data-k]');if(b)addPitch(b.dataset.k);};
-$('undo').onclick=undoPitch;
-$('pEdit').onclick=()=>{if(pitcher())openPitcher(P.sel);};
-$('modeSw').onclick=()=>{S.bso=S.bso==='on'?'off':'on';put(SKEY,S);renderP();
-  toast(S.bso==='on'?'BSO連動に切り替えました':'シンプルに切り替えました');};
-$('innMinus').onclick=()=>{if(P.inning>1){P.inning--;P.bso={b:0,s:0,o:0};savePitch();renderP();}};
-$('innPlus').onclick=()=>{if(P.inning<20){P.inning++;P.bso={b:0,s:0,o:0};savePitch();renderP();}};
-
-/* ---------- tabs ---------- */
-let curTab='timer';
-$('tabs').onclick=e=>{
-  const b=e.target.closest('button');if(!b)return;
-  [...$('tabs').children].forEach(x=>x.classList.toggle('sel',x===b));
-  curTab=b.dataset.t;
-  $('viewTimer').classList.toggle('hide',curTab!=='timer');
-  $('viewPitch').classList.toggle('hide',curTab!=='pitch');
-  $('viewScore').classList.toggle('hide',curTab!=='score');
-  if(curTab==='pitch')renderP();
-  if(curTab==='score')renderS();
-  renderT();
-};
-$('miniT').onclick=e=>{
-  const t=e.target.closest('[data-t]');if(!t)return;
-  const b=[...$('tabs').children].find(x=>x.dataset.t===t.dataset.t);
-  if(b)b.click();
-};
-
-/* ---------- timer controls ---------- */
-$('main').onclick=()=>{unlockAudio();
-  if(itvRunning){endInterval(true);if(!running)startGame();return;}
-  itvDone=false;running?pauseGame():startGame();};
-$('itvBtn').onclick=()=>{unlockAudio();itvRunning?endInterval(true):startInterval();};
-$('frBtn').onclick=()=>{unlockAudio();frRunning?stopFree(true):startFree();};
-$('frReset').onclick=resetFree;
-$('frInfo').onclick=()=>{if(frRunning){toast('停止してから変更できます');return;}openFree();};
-$('finish').onclick=()=>{endAt!==null?openSummary():finishGame();};
-$('reset').onclick=()=>{
-  if(!armed){armed=true;$('reset').classList.add('armed');$('reset').textContent='もう一度でリセット';
-    clearTimeout(armTimer);armTimer=setTimeout(()=>{armed=false;$('reset').classList.remove('armed');renderT();},3000);}
-  else{clearTimeout(armTimer);armed=false;$('reset').classList.remove('armed');resetGame();}};
-$('log').onclick=()=>{
-  if(startAt===null){toast('まだ記録がありません');return;}
-  const d=new Date(startAt);
-  let text=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+'  開始 '+hhmm(startAt)
-    +'  終了 '+(endAt?hhmm(endAt):'—')+'  所要 '+fmt(elapsed);
-  const fmtP=p=>p.name+' '+dayTotal(p,dkey(0))+'球';
-  const own=P.list.filter(p=>(p.team||'own')!=='opp'&&dayTotal(p,dkey(0))>0).map(fmtP);
-  const oppL=P.list.filter(p=>p.team==='opp'&&dayTotal(p,dkey(0))>0).map(fmtP);
-  if(own.length)text+='\n投球数： '+own.join(' / ');
-  if(oppL.length)text+='\n相手投球数： '+oppL.join(' / ');
-  const gsl=dayGames(dkey(0)).filter(gameHas);
-  if(gsl.length){const g=gsl[gsl.length-1];
-    text+='\nスコア： '+g.a.name+' '+scTot(g.a.r)+' - '+scTot(g.b.r)+' '+g.b.name;}
-  navigator.clipboard?.writeText(text).then(()=>toast('コピーしました'),()=>toast('コピーできませんでした'));
-};
-document.addEventListener('keydown',e=>{
-  if(e.target.tagName==='INPUT')return;
-  if(!$('viewTimer').classList.contains('hide')){
-    if(e.code==='Space'){e.preventDefault();$('main').click();}
-    if(e.key.toLowerCase()==='i'){e.preventDefault();$('itvBtn').click();}
-    if(e.key.toLowerCase()==='f'){e.preventDefault();$('frBtn').click();}
-  }else if(!$('viewPitch').classList.contains('hide')&&e.code==='Space'){
-    e.preventDefault();addPitch();
-  }
-});
-
-/* ---------- settings ---------- */
-function closeSheets(){$('sheet').classList.remove('open');$('psheet').classList.remove('open');
-  $('fsheet').classList.remove('open');$('ssheet').classList.remove('open');$('veil').classList.remove('open');}
-function openFree(){
-  $('frM').value=Math.floor(S.freeMs/60000);$('frS').value=Math.floor(S.freeMs%60000/1000);
-  markPresets();$('fsheet').classList.add('open');$('veil').classList.add('open');
-}
-function markPresets(){[...$('frPresets').children].forEach(b=>b.classList.toggle('sel',+b.dataset.ms===S.freeMs));}
-$('frPresets').onclick=e=>{const b=e.target.closest('button');if(!b)return;
-  S.freeMs=+b.dataset.ms;frElapsed=0;$('frM').value=Math.floor(S.freeMs/60000);
-  $('frS').value=Math.floor(S.freeMs%60000/1000);markPresets();put(SKEY,S);renderT();};
-['frM','frS'].forEach(id=>{$(id).oninput=()=>{
-  S.freeMs=numVal('frM',59)*60000+numVal('frS',59)*1000;frElapsed=0;markPresets();put(SKEY,S);renderT();};});
-$('frClose').onclick=closeSheets;
-$('gear').onclick=()=>{fillForm();showStore();$('sheet').classList.add('open');$('veil').classList.add('open');};
-function showStore(){
-  if(!$('storeName'))return;
-  if(storeMode==='local'){$('storeName').textContent='この端末に保存中';
-    $('storeSub').textContent='投手・球数・設定はこの端末のブラウザにだけ残ります';}
-  else{$('storeName').textContent='一時的な保存です';
-    $('storeSub').textContent='この画面ではブラウザ保存が使えません。配布したページで開くと端末に残ります';}
-}
-if($('backup'))$('backup').onclick=()=>{
-  const data={savedAt:new Date().toISOString(),settings:S,pitch:P};
-  navigator.clipboard?.writeText(JSON.stringify(data))
-    .then(()=>toast('バックアップをコピーしました'),()=>toast('コピーできませんでした'));
-};
-$('close').onclick=closeSheets;$('veil').onclick=closeSheets;
-function fillForm(){
-  $('sH').value=Math.floor(S.gameMs/3600000);
-  $('sM').value=Math.floor(S.gameMs%3600000/60000);
-  $('sIM').value=Math.floor(S.itvMs/60000);
-  $('sIS').value=Math.floor(S.itvMs%60000/1000);
-  $('sDaily').value=S.daily;$('sTwo').value=S.twoDay;$('sWarn').value=S.warn;
-  seg('segResume',S.resume);seg('segFreePause',S.freePause);seg('segBso',S.bso);
-  seg('segSound',S.sound);seg('segVib',S.vib);seg('segWake',S.wake);
-}
-function seg(id,v){[...$(id).children].forEach(b=>b.classList.toggle('sel',b.dataset.v===v));}
-function bindSeg(id,key,after){$(id).onclick=e=>{const b=e.target.closest('button');if(!b)return;
-  S[key]=b.dataset.v;seg(id,S[key]);put(SKEY,S);after&&after();renderT();};}
-bindSeg('segResume','resume');bindSeg('segFreePause','freePause');bindSeg('segBso','bso',()=>renderP());
-bindSeg('segSound','sound',unlockAudio);
-bindSeg('segVib','vib');bindSeg('segWake','wake',syncWake);
-function numVal(id,max){const n=parseInt($(id).value,10);return isNaN(n)?0:Math.min(Math.max(n,0),max);}
-function applySettings(){
-  S.gameMs=(numVal('sH',9)*60+numVal('sM',59))*60000;
-  S.itvMs=numVal('sIM',59)*60000+numVal('sIS',59)*1000;
-  S.daily=numVal('sDaily',300);S.twoDay=numVal('sTwo',600);S.warn=numVal('sWarn',99);
-  overNotified=elapsed>=S.gameMs;
-  put(SKEY,S);renderT();renderP();
-}
-['sH','sM','sIM','sIS','sDaily','sTwo','sWarn'].forEach(id=>{$(id).oninput=applySettings;});
-
-/* ---------- ＋−ボタン ---------- */
-document.addEventListener('click',e=>{
-  const b=e.target.closest('[data-step]');if(!b)return;
-  const inp=$(b.dataset.tgt),st=+b.dataset.step;
-  let v=parseInt(inp.value,10);if(isNaN(v))v=0;
-  v=Math.abs(st)===10?Math.round((v+st)/10)*10:v+st;
-  v=Math.max(+inp.min||0,Math.min(+inp.max,v));
-  inp.value=v;inp.dispatchEvent(new Event('input'));
-});
-
-/* ---------- boot ---------- */
-(async()=>{
-  const s=await get(SKEY);if(s)Object.assign(S,s);
-  const g=await get(GKEY);
-  if(g&&g.startAt){
-    ({elapsed,running,itvElapsed,itvRunning,itvDone,wasRunning,startAt,endAt}=g);
-    frElapsed=g.frElapsed||0;frRunning=!!g.frRunning;frWasRunning=!!g.frWasRunning;
-    const gap=Date.now()-(g.at||Date.now());
-    if(running)elapsed+=gap;
-    if(frRunning){frElapsed+=gap;
-      if(S.freeMs>0&&frElapsed>=S.freeMs){frElapsed=S.freeMs;frRunning=false;
-        if(S.freePause==='on'&&frWasRunning)running=true;frWasRunning=false;}}
-    if(itvRunning){itvElapsed+=gap;
-      if(itvElapsed>=S.itvMs){itvRunning=false;itvElapsed=0;
-        if(S.resume==='auto'&&wasRunning)running=true;else itvDone=true;}}
-    overNotified=elapsed>=S.gameMs;syncWake();
-  }
-  const p=await get(PKEY);if(p&&p.list)P=p;
-  const c=await get(CKEY);if(c&&c.days)SC=c;
-  P.list.forEach(pp=>{Object.keys(pp.days||{}).forEach(k=>migDay(pp.days[k]));pp.stack=pp.stack||[];});
-  Object.keys(SC.days||{}).forEach(k=>{const d=SC.days[k];if(d&&!d.games)SC.days[k]={games:[d]};});
-  P.game=P.game||1;P.gameDate=P.gameDate||dkey(0);checkGameDate();
-  if(P.sel&&!P.list.some(x=>x.id===P.sel))P.sel=P.list.length?P.list[0].id:null;
-  last=performance.now();fillForm();renderT();renderP();renderS();
-})();
-renderT();renderP();
-</script>
+<footer>© 2026 KREATIO WORKS</footer>
+</body>
+</html>
